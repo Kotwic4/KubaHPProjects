@@ -54,6 +54,10 @@ let snitchChangeTimer = null;
 let fieldW = 0;
 let fieldH = 0;
 
+// Klawiatura - strzałki
+const keys = { up: false, down: false, left: false, right: false };
+let usingKeys = false;
+
 const field = document.getElementById("field");
 const player = document.getElementById("player");
 const snitch = document.getElementById("snitch");
@@ -75,6 +79,8 @@ function startGame(diff) {
   timerEl.textContent = GAME_DURATION;
   timerEl.classList.remove("warning");
   bestEl.textContent = bestScore;
+  keys.up = keys.down = keys.left = keys.right = false;
+  usingKeys = false;
 
   document.getElementById("intro").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
@@ -139,15 +145,40 @@ function snitchFlee() {
 function gameLoop() {
   if (!gameRunning) return;
 
-  // Gracz leci płynnie w stronę palca/myszy
-  const pdx = targetPlayerX - playerX;
-  const pdy = targetPlayerY - playerY;
-  const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
+  // Ruch gracza
+  let pdx = 0;
+  let pdy = 0;
 
-  if (pDist > 2) {
-    const speed = Math.min(difficulty.playerSpeed, pDist * 0.15);
-    playerX += (pdx / pDist) * speed;
-    playerY += (pdy / pDist) * speed;
+  if (usingKeys) {
+    // Sterowanie strzałkami / WASD
+    if (keys.left) pdx -= difficulty.playerSpeed;
+    if (keys.right) pdx += difficulty.playerSpeed;
+    if (keys.up) pdy -= difficulty.playerSpeed;
+    if (keys.down) pdy += difficulty.playerSpeed;
+
+    // Normalizuj ruch po skosie
+    if (pdx !== 0 && pdy !== 0) {
+      pdx *= 0.707;
+      pdy *= 0.707;
+    }
+
+    playerX += pdx;
+    playerY += pdy;
+
+    // Nie wylatuj za pole
+    playerX = Math.max(0, Math.min(fieldW - 80, playerX));
+    playerY = Math.max(0, Math.min(fieldH - 40, playerY));
+  } else {
+    // Sterowanie myszką/dotykiem
+    pdx = targetPlayerX - playerX;
+    pdy = targetPlayerY - playerY;
+    const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
+
+    if (pDist > 2) {
+      const speed = Math.min(difficulty.playerSpeed, pDist * 0.15);
+      playerX += (pdx / pDist) * speed;
+      playerY += (pdy / pDist) * speed;
+    }
   }
 
   // Znicz leci w stronę swojego celu
@@ -166,10 +197,12 @@ function gameLoop() {
   snitchFlee();
 
   // Odwracamy gracza w stronę ruchu
-  if (pdx < -2) {
-    player.classList.add("facing-left");
-  } else if (pdx > 2) {
-    player.classList.remove("facing-left");
+  if (usingKeys) {
+    if (keys.left) player.classList.add("facing-left");
+    else if (keys.right) player.classList.remove("facing-left");
+  } else {
+    if (pdx < -2) player.classList.add("facing-left");
+    else if (pdx > 2) player.classList.remove("facing-left");
   }
 
   // Sprawdzamy kolizję (złapanie znicza)
@@ -192,8 +225,27 @@ function updatePositions() {
   snitch.style.top = snitchY + "px";
 }
 
+// Sterowanie - klawiatura (strzałki + WASD)
+document.addEventListener("keydown", function (e) {
+  if (!gameRunning) return;
+  const key = e.key;
+  if (key === "ArrowUp" || key === "w" || key === "W") { keys.up = true; usingKeys = true; e.preventDefault(); }
+  if (key === "ArrowDown" || key === "s" || key === "S") { keys.down = true; usingKeys = true; e.preventDefault(); }
+  if (key === "ArrowLeft" || key === "a" || key === "A") { keys.left = true; usingKeys = true; e.preventDefault(); }
+  if (key === "ArrowRight" || key === "d" || key === "D") { keys.right = true; usingKeys = true; e.preventDefault(); }
+});
+
+document.addEventListener("keyup", function (e) {
+  const key = e.key;
+  if (key === "ArrowUp" || key === "w" || key === "W") keys.up = false;
+  if (key === "ArrowDown" || key === "s" || key === "S") keys.down = false;
+  if (key === "ArrowLeft" || key === "a" || key === "A") keys.left = false;
+  if (key === "ArrowRight" || key === "d" || key === "D") keys.right = false;
+});
+
 // Sterowanie - mysz
 field.addEventListener("mousemove", function (e) {
+  usingKeys = false;
   if (!gameRunning) return;
   const rect = field.getBoundingClientRect();
   targetPlayerX = e.clientX - rect.left - 40;
@@ -204,6 +256,7 @@ field.addEventListener("mousemove", function (e) {
 // Sterowanie - dotyk
 field.addEventListener("touchmove", function (e) {
   if (!gameRunning) return;
+  usingKeys = false;
   e.preventDefault();
   const touch = e.touches[0];
   const rect = field.getBoundingClientRect();
@@ -214,6 +267,7 @@ field.addEventListener("touchmove", function (e) {
 
 field.addEventListener("touchstart", function (e) {
   if (!gameRunning) return;
+  usingKeys = false;
   e.preventDefault();
   const touch = e.touches[0];
   const rect = field.getBoundingClientRect();
