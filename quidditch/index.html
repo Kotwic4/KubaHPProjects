@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Złap Złotego Znicza!</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="quidditch.css">
+</head>
+<body>
+  <div class="container">
+    <a href="../" class="back-link">Powrót do Magicznego Świata</a>
+
+    <div id="intro" class="screen">
+      <h1>Złap Złotego Znicza!</h1>
+      <p class="subtitle">Znicz lata coraz szybciej... Ile razy zdołasz go złapać?</p>
+      <div class="snitch-preview">
+        <svg class="snitch-svg" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+          <g class="wing left-wing">
+            <ellipse cx="20" cy="28" rx="18" ry="8" fill="rgba(255,255,255,0.7)" stroke="#ccc" stroke-width="0.5" transform="rotate(-15 20 28)"/>
+            <ellipse cx="14" cy="22" rx="12" ry="5" fill="rgba(255,255,255,0.5)" stroke="#ccc" stroke-width="0.5" transform="rotate(-25 14 22)"/>
+          </g>
+          <circle cx="60" cy="30" r="14" fill="url(#snitchGold)"/>
+          <circle cx="60" cy="30" r="12" fill="url(#snitchShine)"/>
+          <ellipse cx="55" cy="24" rx="4" ry="3" fill="rgba(255,255,255,0.5)" transform="rotate(-20 55 24)"/>
+          <g class="wing right-wing">
+            <ellipse cx="100" cy="28" rx="18" ry="8" fill="rgba(255,255,255,0.7)" stroke="#ccc" stroke-width="0.5" transform="rotate(15 100 28)"/>
+            <ellipse cx="106" cy="22" rx="12" ry="5" fill="rgba(255,255,255,0.5)" stroke="#ccc" stroke-width="0.5" transform="rotate(25 106 22)"/>
+          </g>
+          <defs>
+            <radialGradient id="snitchGold" cx="40%" cy="35%">
+              <stop offset="0%" stop-color="#ffe066"/>
+              <stop offset="50%" stop-color="#d4a843"/>
+              <stop offset="100%" stop-color="#a67c2e"/>
+            </radialGradient>
+            <radialGradient id="snitchShine" cx="35%" cy="30%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="difficulty-select">
+        <p class="diff-label">Wybierz poziom trudności:</p>
+        <div class="diff-buttons">
+          <button class="magic-btn diff-btn" onclick="startGame('easy')">
+            Łatwy
+            <span class="diff-desc">Znicz jest powolny</span>
+          </button>
+          <button class="magic-btn diff-btn" onclick="startGame('medium')">
+            Średni
+            <span class="diff-desc">Dla prawdziwego gracza</span>
+          </button>
+          <button class="magic-btn diff-btn" onclick="startGame('hard')">
+            Trudny
+            <span class="diff-desc">Szybki jak błyskawica!</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="game" class="screen hidden">
+      <div class="game-hud">
+        <div class="hud-item">
+          <span class="hud-label">Złapane</span>
+          <span class="hud-value" id="score">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Czas</span>
+          <span class="hud-value" id="timer">30</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Najlepszy</span>
+          <span class="hud-value" id="best">0</span>
+        </div>
+      </div>
+      <div class="game-field" id="field">
+        <div class="snitch" id="snitch">
+          <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+            <g class="wing left-wing">
+              <ellipse cx="20" cy="28" rx="18" ry="8" fill="rgba(255,255,255,0.7)" stroke="#ccc" stroke-width="0.5" transform="rotate(-15 20 28)"/>
+              <ellipse cx="14" cy="22" rx="12" ry="5" fill="rgba(255,255,255,0.5)" stroke="#ccc" stroke-width="0.5" transform="rotate(-25 14 22)"/>
+            </g>
+            <circle cx="60" cy="30" r="14" fill="url(#sg)"/>
+            <circle cx="60" cy="30" r="12" fill="url(#ss)"/>
+            <ellipse cx="55" cy="24" rx="4" ry="3" fill="rgba(255,255,255,0.5)" transform="rotate(-20 55 24)"/>
+            <g class="wing right-wing">
+              <ellipse cx="100" cy="28" rx="18" ry="8" fill="rgba(255,255,255,0.7)" stroke="#ccc" stroke-width="0.5" transform="rotate(15 100 28)"/>
+              <ellipse cx="106" cy="22" rx="12" ry="5" fill="rgba(255,255,255,0.5)" stroke="#ccc" stroke-width="0.5" transform="rotate(25 106 22)"/>
+            </g>
+            <defs>
+              <radialGradient id="sg" cx="40%" cy="35%">
+                <stop offset="0%" stop-color="#ffe066"/>
+                <stop offset="50%" stop-color="#d4a843"/>
+                <stop offset="100%" stop-color="#a67c2e"/>
+              </radialGradient>
+              <radialGradient id="ss" cx="35%" cy="30%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="catch-effect" id="catchEffect">+1</div>
+      </div>
+    </div>
+
+    <div id="result" class="screen hidden">
+      <h1 id="result-title"></h1>
+      <div class="result-snitch">
+        <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" width="100">
+          <g class="wing left-wing">
+            <ellipse cx="20" cy="28" rx="18" ry="8" fill="rgba(255,255,255,0.7)" stroke="#ccc" stroke-width="0.5" transform="rotate(-15 20 28)"/>
+            <ellipse cx="14" cy="22" rx="12" ry="5" fill="rgba(255,255,255,0.5)" stroke="#ccc" stroke-width="0.5" transform="rotate(-25 14 22)"/>
+          </g>
+          <circle cx="60" cy="30" r="14" fill="url(#sg2)"/>
+          <circle cx="60" cy="30" r="12" fill="url(#ss2)"/>
+          <ellipse cx="55" cy="24" rx="4" ry="3" fill="rgba(255,255,255,0.5)" transform="rotate(-20 55 24)"/>
+          <g class="wing right-wing">
+            <ellipse cx="100" cy="28" rx="18" ry="8" fill="rgba(255,255,255,0.7)" stroke="#ccc" stroke-width="0.5" transform="rotate(15 100 28)"/>
+            <ellipse cx="106" cy="22" rx="12" ry="5" fill="rgba(255,255,255,0.5)" stroke="#ccc" stroke-width="0.5" transform="rotate(25 106 22)"/>
+          </g>
+          <defs>
+            <radialGradient id="sg2" cx="40%" cy="35%">
+              <stop offset="0%" stop-color="#ffe066"/>
+              <stop offset="50%" stop-color="#d4a843"/>
+              <stop offset="100%" stop-color="#a67c2e"/>
+            </radialGradient>
+            <radialGradient id="ss2" cx="35%" cy="30%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+      <p class="result-score">Złapałeś <span id="final-score">0</span> razy!</p>
+      <p class="result-msg" id="result-msg"></p>
+      <div class="result-actions">
+        <button class="magic-btn" onclick="backToIntro()">Zagraj ponownie</button>
+        <a href="../" class="magic-btn secondary">Strona główna</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="quidditch.js"></script>
+</body>
+</html>

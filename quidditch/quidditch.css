@@ -1,0 +1,352 @@
+.back-link {
+  display: inline-block;
+  color: var(--gold);
+  text-decoration: none;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.back-link:hover {
+  opacity: 1;
+}
+
+.screen {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Intro ===== */
+
+.snitch-preview {
+  margin: 1.5rem 0;
+}
+
+.snitch-preview .snitch-svg {
+  width: 140px;
+  animation: snitchFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(212, 168, 67, 0.5));
+}
+
+@keyframes snitchFloat {
+  0%, 100% { transform: translateY(0) translateX(-5px); }
+  25% { transform: translateY(-10px) translateX(5px); }
+  50% { transform: translateY(3px) translateX(8px); }
+  75% { transform: translateY(-8px) translateX(-3px); }
+}
+
+.wing {
+  animation: flapWing 0.15s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.left-wing {
+  animation-name: flapLeft;
+}
+
+.right-wing {
+  animation-name: flapRight;
+}
+
+@keyframes flapLeft {
+  0% { transform: rotate(0deg) scaleY(1); }
+  100% { transform: rotate(-8deg) scaleY(0.7); }
+}
+
+@keyframes flapRight {
+  0% { transform: rotate(0deg) scaleY(1); }
+  100% { transform: rotate(8deg) scaleY(0.7); }
+}
+
+.difficulty-select {
+  margin-top: 1.5rem;
+}
+
+.diff-label {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text-light);
+}
+
+.diff-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.diff-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 140px;
+}
+
+.diff-desc {
+  font-family: 'Lora', serif;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* ===== Buttons ===== */
+
+.magic-btn {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 1.1rem;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, var(--gold), #b8942e);
+  color: var(--darker-bg);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.magic-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(212, 168, 67, 0.5);
+}
+
+.magic-btn.secondary {
+  background: transparent;
+  color: var(--gold);
+  border: 2px solid var(--gold);
+}
+
+/* ===== Game HUD ===== */
+
+.game-hud {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.6;
+}
+
+.hud-value {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2rem;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(212, 168, 67, 0.4);
+}
+
+#timer.warning {
+  color: #e74c3c;
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+  animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+/* ===== Game Field ===== */
+
+.game-field {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  max-height: 500px;
+  min-height: 300px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(10, 30, 60, 0.8) 0%, transparent 70%),
+    linear-gradient(180deg, #0a1628 0%, #162040 40%, #1a3020 70%, #0d2010 100%);
+  border: 2px solid rgba(212, 168, 67, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Quidditch field lines */
+.game-field::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 40%),
+    linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 60px;
+  pointer-events: none;
+}
+
+/* ===== Snitch ===== */
+
+.snitch {
+  position: absolute;
+  width: 70px;
+  height: 35px;
+  cursor: pointer;
+  z-index: 10;
+  filter: drop-shadow(0 0 12px rgba(212, 168, 67, 0.6));
+  transition: filter 0.1s;
+}
+
+.snitch:hover {
+  filter: drop-shadow(0 0 20px rgba(212, 168, 67, 0.9));
+}
+
+.snitch svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.snitch.caught {
+  animation: caughtFlash 0.3s ease-out;
+  pointer-events: none;
+}
+
+@keyframes caughtFlash {
+  0% { filter: drop-shadow(0 0 30px rgba(255, 230, 100, 1)) brightness(2); transform: scale(1.5); }
+  100% { filter: drop-shadow(0 0 0px transparent) brightness(1); transform: scale(0.5); opacity: 0; }
+}
+
+/* Golden trail */
+.snitch::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 10px var(--gold),
+    -10px 5px 6px rgba(212, 168, 67, 0.3),
+    -20px 2px 4px rgba(212, 168, 67, 0.2),
+    -30px 8px 3px rgba(212, 168, 67, 0.1);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ===== Catch Effect ===== */
+
+.catch-effect {
+  position: absolute;
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2rem;
+  color: var(--gold);
+  text-shadow: 0 0 15px rgba(212, 168, 67, 0.8);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+}
+
+.catch-effect.show {
+  animation: catchPop 0.8s ease-out forwards;
+}
+
+@keyframes catchPop {
+  0% { opacity: 1; transform: translateY(0) scale(0.5); }
+  50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+}
+
+/* Spark burst on catch */
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.spark.animate {
+  animation: sparkBurst 0.5s ease-out forwards;
+}
+
+@keyframes sparkBurst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+}
+
+/* ===== Result ===== */
+
+.result-snitch {
+  margin: 1rem 0;
+  animation: snitchFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(212, 168, 67, 0.5));
+}
+
+.result-score {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+.result-msg {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0.85;
+  max-width: 400px;
+  margin: 0 auto 2rem;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 600px) {
+  .game-field {
+    height: 55vh;
+    min-height: 280px;
+    border-radius: 12px;
+  }
+
+  .game-hud {
+    gap: 1.5rem;
+  }
+
+  .hud-value {
+    font-size: 1.5rem;
+  }
+
+  .snitch {
+    width: 60px;
+    height: 30px;
+  }
+
+  .diff-btn {
+    min-width: 110px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+}
