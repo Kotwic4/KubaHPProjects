@@ -14,7 +14,57 @@
     <div id="intro" class="screen">
       <h1>Tiara Przydziału</h1>
       <p class="subtitle">Usiądź, włóż mnie na głowę, a powiem ci, gdzie twoje miejsce...</p>
-      <div class="hat-icon">🎩</div>
+      <div class="hat-wrapper intro-hat">
+        <div class="sparkles">
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+        </div>
+        <svg class="sorting-hat-svg" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Hat brim -->
+          <ellipse cx="100" cy="155" rx="90" ry="18" fill="#3d2b1a" stroke="#6b4c2a" stroke-width="1.5"/>
+          <ellipse cx="100" cy="152" rx="85" ry="15" fill="#5a3d25"/>
+          <!-- Hat body -->
+          <path d="M30 155 Q25 110 45 80 Q55 60 60 40 Q70 15 85 5 Q95 -2 100 8 Q105 18 108 35 Q115 55 130 70 Q155 95 170 155 Z"
+                fill="url(#hatGradient)" stroke="#6b4c2a" stroke-width="1.5"/>
+          <!-- Patches and wrinkles -->
+          <path d="M55 120 Q70 115 80 125" fill="none" stroke="#3d2b1a" stroke-width="1.5" opacity="0.6"/>
+          <path d="M110 100 Q130 95 145 110" fill="none" stroke="#3d2b1a" stroke-width="1.5" opacity="0.6"/>
+          <path d="M70 85 Q80 80 90 88" fill="none" stroke="#3d2b1a" stroke-width="1.5" opacity="0.5"/>
+          <!-- Patch -->
+          <path d="M120 120 L130 110 L142 118 L135 130 Z" fill="#4a3320" stroke="#3d2b1a" stroke-width="1" opacity="0.7"/>
+          <!-- Hat band -->
+          <path d="M35 148 Q100 130 165 148" fill="none" stroke="#8b6914" stroke-width="4" opacity="0.8"/>
+          <path d="M35 148 Q100 132 165 148" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.4"/>
+          <!-- Face - eyes -->
+          <g class="hat-face">
+            <path class="hat-eye left-eye" d="M65 108 Q72 100 80 108" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <path class="hat-eye right-eye" d="M115 105 Q122 97 130 105" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Eye glow -->
+            <circle cx="72" cy="105" r="3" fill="#d4a843" opacity="0.6" class="eye-glow"/>
+            <circle cx="122" cy="102" r="3" fill="#d4a843" opacity="0.6" class="eye-glow"/>
+            <!-- Mouth -->
+            <path class="hat-mouth" d="M75 128 Q95 140 125 128" fill="#1a0a00" stroke="#3d2b1a" stroke-width="1.5"/>
+          </g>
+          <!-- Magical glow -->
+          <ellipse cx="100" cy="80" rx="60" ry="50" fill="url(#magicGlow)" opacity="0.15" class="magic-aura"/>
+          <defs>
+            <linearGradient id="hatGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#6b4c2a"/>
+              <stop offset="30%" stop-color="#5a3d25"/>
+              <stop offset="60%" stop-color="#4a3018"/>
+              <stop offset="100%" stop-color="#3d2510"/>
+            </linearGradient>
+            <radialGradient id="magicGlow" cx="50%" cy="50%">
+              <stop offset="0%" stop-color="#d4a843"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
       <button class="magic-btn" onclick="startQuiz()">Rozpocznij Przydział!</button>
     </div>
 
@@ -22,10 +72,52 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progress"></div>
       </div>
-      <div id="question-container">
-        <h2 id="question-text"></h2>
-        <div id="answers" class="answers"></div>
+      <div class="hat-speaks">
+        <div class="hat-wrapper quiz-hat">
+          <div class="sparkles">
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+          </div>
+          <svg class="sorting-hat-svg" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="100" cy="155" rx="90" ry="18" fill="#3d2b1a" stroke="#6b4c2a" stroke-width="1.5"/>
+            <ellipse cx="100" cy="152" rx="85" ry="15" fill="#5a3d25"/>
+            <path d="M30 155 Q25 110 45 80 Q55 60 60 40 Q70 15 85 5 Q95 -2 100 8 Q105 18 108 35 Q115 55 130 70 Q155 95 170 155 Z"
+                  fill="url(#hatGradient2)" stroke="#6b4c2a" stroke-width="1.5"/>
+            <path d="M55 120 Q70 115 80 125" fill="none" stroke="#3d2b1a" stroke-width="1.5" opacity="0.6"/>
+            <path d="M110 100 Q130 95 145 110" fill="none" stroke="#3d2b1a" stroke-width="1.5" opacity="0.6"/>
+            <path d="M70 85 Q80 80 90 88" fill="none" stroke="#3d2b1a" stroke-width="1.5" opacity="0.5"/>
+            <path d="M120 120 L130 110 L142 118 L135 130 Z" fill="#4a3320" stroke="#3d2b1a" stroke-width="1" opacity="0.7"/>
+            <path d="M35 148 Q100 130 165 148" fill="none" stroke="#8b6914" stroke-width="4" opacity="0.8"/>
+            <path d="M35 148 Q100 132 165 148" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.4"/>
+            <g class="hat-face">
+              <path class="hat-eye left-eye" d="M65 108 Q72 100 80 108" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+              <path class="hat-eye right-eye" d="M115 105 Q122 97 130 105" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="72" cy="105" r="3" fill="#d4a843" opacity="0.6" class="eye-glow"/>
+              <circle cx="122" cy="102" r="3" fill="#d4a843" opacity="0.6" class="eye-glow"/>
+              <path class="hat-mouth speaking" d="M75 128 Q95 140 125 128" fill="#1a0a00" stroke="#3d2b1a" stroke-width="1.5"/>
+            </g>
+            <ellipse cx="100" cy="80" rx="60" ry="50" fill="url(#magicGlow2)" opacity="0.15" class="magic-aura"/>
+            <defs>
+              <linearGradient id="hatGradient2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#6b4c2a"/>
+                <stop offset="30%" stop-color="#5a3d25"/>
+                <stop offset="60%" stop-color="#4a3018"/>
+                <stop offset="100%" stop-color="#3d2510"/>
+              </linearGradient>
+              <radialGradient id="magicGlow2" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#d4a843"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="speech-bubble">
+          <h2 id="question-text"></h2>
+        </div>
       </div>
+      <div id="answers" class="answers"></div>
     </div>
 
     <div id="result" class="screen hidden">

@@ -97,6 +97,8 @@ const houses = {
 
 let currentQuestion = 0;
 let scores = { gryffindor: 0, hufflepuff: 0, ravenclaw: 0, slytherin: 0 };
+let typewriterTimeout = null;
+let isAnimating = false;
 
 function startQuiz() {
   currentQuestion = 0;
@@ -109,28 +111,93 @@ function startQuiz() {
   showQuestion();
 }
 
-function showQuestion() {
-  const q = questions[currentQuestion];
-  document.getElementById("question-text").textContent = q.text;
-  document.getElementById("progress").style.width =
-    ((currentQuestion / questions.length) * 100) + "%";
+function typewriteQuestion(text, onComplete) {
+  const questionEl = document.getElementById("question-text");
+  const words = text.split(" ");
+  questionEl.innerHTML = "";
+  isAnimating = true;
 
+  // Usta tiary się ruszają podczas mówienia
+  const mouth = document.querySelector("#quiz .hat-mouth");
+  mouth.classList.add("speaking");
+  mouth.classList.remove("silent");
+
+  // Tworzymy spany dla każdego słowa
+  words.forEach((word) => {
+    const span = document.createElement("span");
+    span.className = "word";
+    span.textContent = word;
+    questionEl.appendChild(span);
+  });
+
+  const wordSpans = questionEl.querySelectorAll(".word");
+  let i = 0;
+
+  function showNextWord() {
+    if (i > 0) {
+      wordSpans[i - 1].classList.remove("cursor");
+    }
+
+    if (i < wordSpans.length) {
+      wordSpans[i].classList.add("visible", "cursor");
+      i++;
+      typewriterTimeout = setTimeout(showNextWord, 120 + Math.random() * 80);
+    } else {
+      // Koniec - usta przestają się ruszać
+      mouth.classList.remove("speaking");
+      mouth.classList.add("silent");
+      if (wordSpans.length > 0) {
+        wordSpans[wordSpans.length - 1].classList.remove("cursor");
+      }
+      isAnimating = false;
+      if (onComplete) onComplete();
+    }
+  }
+
+  typewriterTimeout = setTimeout(showNextWord, 300);
+}
+
+function showAnswers(answersData) {
   const answersDiv = document.getElementById("answers");
   answersDiv.innerHTML = "";
 
-  // Mieszamy odpowiedzi żeby nie były zawsze w tej samej kolejności
-  const shuffled = [...q.answers].sort(() => Math.random() - 0.5);
+  // Mieszamy odpowiedzi
+  const shuffled = [...answersData].sort(() => Math.random() - 0.5);
 
-  shuffled.forEach((answer) => {
+  shuffled.forEach((answer, index) => {
     const btn = document.createElement("button");
     btn.className = "answer-btn";
     btn.textContent = answer.text;
-    btn.onclick = () => selectAnswer(answer.house);
+    btn.onclick = () => {
+      if (!isAnimating) selectAnswer(answer.house);
+    };
     answersDiv.appendChild(btn);
+
+    // Odpowiedzi pojawiają się jedna po drugiej
+    setTimeout(() => {
+      btn.classList.add("visible");
+    }, index * 150);
+  });
+}
+
+function showQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById("progress").style.width =
+    ((currentQuestion / questions.length) * 100) + "%";
+
+  // Czyścimy odpowiedzi
+  document.getElementById("answers").innerHTML = "";
+
+  // Tiara "mówi" pytanie słowo po słowie
+  typewriteQuestion(q.text, () => {
+    // Po zakończeniu mówienia, pokazujemy odpowiedzi
+    showAnswers(q.answers);
   });
 }
 
 function selectAnswer(house) {
+  if (typewriterTimeout) clearTimeout(typewriterTimeout);
+
   scores[house]++;
   currentQuestion++;
 
@@ -144,7 +211,6 @@ function selectAnswer(house) {
 function showResult() {
   document.getElementById("quiz").classList.add("hidden");
 
-  // Znajdujemy dom z najwyższym wynikiem
   const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
   const house = houses[winner];
 
@@ -158,6 +224,7 @@ function showResult() {
 }
 
 function resetQuiz() {
+  if (typewriterTimeout) clearTimeout(typewriterTimeout);
   document.getElementById("result").classList.add("hidden");
   document.getElementById("intro").classList.remove("hidden");
 }
