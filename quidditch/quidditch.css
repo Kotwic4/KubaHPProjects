@@ -93,14 +93,60 @@
   100% { transform: rotate(8deg) scaleY(0.7); }
 }
 
-.difficulty-select {
-  margin-top: 0.5rem;
+/* ===== House Select ===== */
+
+.house-select {
+  margin-bottom: 1.5rem;
 }
 
-.diff-label {
+.select-label {
   font-size: 1.1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   color: var(--text-light);
+}
+
+.house-buttons {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.house-btn {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-light);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.house-btn:hover {
+  transform: scale(1.05);
+}
+
+.house-icon {
+  font-size: 1.1rem;
+}
+
+.gryffindor-btn { border-color: rgba(174, 0, 1, 0.4); }
+.hufflepuff-btn { border-color: rgba(236, 185, 57, 0.4); }
+.ravenclaw-btn { border-color: rgba(34, 47, 91, 0.4); }
+.slytherin-btn { border-color: rgba(42, 98, 61, 0.4); }
+
+.gryffindor-btn.selected { background: rgba(174, 0, 1, 0.3); border-color: #ae0001; box-shadow: 0 0 12px rgba(174, 0, 1, 0.3); }
+.hufflepuff-btn.selected { background: rgba(236, 185, 57, 0.3); border-color: #ecb939; box-shadow: 0 0 12px rgba(236, 185, 57, 0.3); }
+.ravenclaw-btn.selected { background: rgba(34, 47, 91, 0.3); border-color: #222f5b; box-shadow: 0 0 12px rgba(34, 47, 91, 0.3); }
+.slytherin-btn.selected { background: rgba(42, 98, 61, 0.3); border-color: #2a623d; box-shadow: 0 0 12px rgba(42, 98, 61, 0.3); }
+
+.difficulty-select {
+  margin-top: 0.5rem;
 }
 
 .diff-buttons {
@@ -373,6 +419,22 @@
 }
 
 /* ===== Responsive ===== */
+
+@media (max-width: 1024px) and (min-width: 601px) {
+  .player {
+    width: 60px;
+    height: 30px;
+  }
+
+  .snitch {
+    width: 42px;
+    height: 21px;
+  }
+
+  .game-field {
+    height: 55vh;
+  }
+}
 
 @media (max-width: 600px) {
   .game-field {

@@ -30,6 +30,14 @@ const messages = [
   { min: 19, max: Infinity, text: "LEGENDA! Nawet Viktor Krum by ci zazdrościł! Absolutny rekord!" },
 ];
 
+const HOUSE_COLORS = {
+  gryffindor: "#ae0001",
+  hufflepuff: "#ecb939",
+  ravenclaw: "#222f5b",
+  slytherin: "#2a623d",
+};
+
+let selectedHouse = "gryffindor";
 let score = 0;
 let timeLeft = GAME_DURATION;
 let gameTimer = null;
@@ -68,6 +76,26 @@ const catchEffect = document.getElementById("catchEffect");
 
 bestEl.textContent = bestScore;
 
+function selectHouse(house) {
+  selectedHouse = house;
+  document.querySelectorAll(".house-btn").forEach((btn) => {
+    btn.classList.toggle("selected", btn.dataset.house === house);
+  });
+}
+
+function applyHouseColors() {
+  const color = HOUSE_COLORS[selectedHouse];
+  // Zmień kolor szalika gracza
+  document.querySelectorAll("#player .scarf").forEach((s) => {
+    s.setAttribute("stroke", color);
+  });
+  // Zmień kolor szaty na ciemniejszą wersję koloru domu
+  document.querySelectorAll("#player .robe").forEach((r) => {
+    r.setAttribute("fill", color);
+    r.setAttribute("opacity", "0.7");
+  });
+}
+
 function startGame(diff) {
   difficulty = DIFFICULTY[diff];
   score = 0;
@@ -85,6 +113,8 @@ function startGame(diff) {
   document.getElementById("intro").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
+
+  applyHouseColors();
 
   const rect = field.getBoundingClientRect();
   fieldW = rect.width;
