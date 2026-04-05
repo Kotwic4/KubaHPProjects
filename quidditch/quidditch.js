@@ -76,25 +76,47 @@ const catchEffect = document.getElementById("catchEffect");
 
 bestEl.textContent = bestScore;
 
+// Wybór domu - event listener działa na telefonie i komputerze
+document.getElementById("house-buttons").addEventListener("pointerdown", function (e) {
+  const btn = e.target.closest(".house-btn");
+  if (!btn) return;
+  e.preventDefault();
+  selectHouse(btn.dataset.house);
+});
+
 function selectHouse(house) {
   selectedHouse = house;
   document.querySelectorAll(".house-btn").forEach((btn) => {
     btn.classList.toggle("selected", btn.dataset.house === house);
   });
+  // Aktualizuj podgląd postaci
+  updatePreviewColors();
+}
+
+function updatePreviewColors() {
+  const color = HOUSE_COLORS[selectedHouse];
+  document.querySelectorAll(".preview-scarf").forEach((s) => {
+    s.setAttribute("stroke", color);
+  });
+  document.querySelectorAll(".preview-robe").forEach((r) => {
+    r.setAttribute("fill", color);
+    r.setAttribute("opacity", "0.7");
+  });
 }
 
 function applyHouseColors() {
   const color = HOUSE_COLORS[selectedHouse];
-  // Zmień kolor szalika gracza
   document.querySelectorAll("#player .scarf").forEach((s) => {
     s.setAttribute("stroke", color);
   });
-  // Zmień kolor szaty na ciemniejszą wersję koloru domu
   document.querySelectorAll("#player .robe").forEach((r) => {
     r.setAttribute("fill", color);
     r.setAttribute("opacity", "0.7");
   });
 }
+
+// Ustaw kolory podglądu na start
+updatePreviewColors();
 
 function startGame(diff) {
   difficulty = DIFFICULTY[diff];

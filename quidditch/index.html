@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Złap Złotego Znicza!</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="quidditch.css">
 </head>
@@ -16,15 +19,15 @@
       <p class="subtitle">Leć na miotle i złap Znicza zanim ucieknie!</p>
       <div class="intro-preview">
         <!-- Player broom preview -->
-        <svg class="broom-preview" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" width="100">
+        <svg class="broom-preview" id="broom-preview" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" width="100">
           <!-- Robe/body -->
-          <ellipse cx="45" cy="32" rx="12" ry="14" fill="#2c1810" stroke="#1a0e08" stroke-width="1"/>
+          <ellipse class="preview-robe" cx="45" cy="32" rx="12" ry="14" fill="#2c1810" stroke="#1a0e08" stroke-width="1"/>
           <!-- Head -->
           <circle cx="45" cy="16" r="10" fill="#f0c8a0"/>
           <!-- Hair -->
           <path d="M35 14 Q38 6 45 5 Q52 6 55 14 Q54 10 45 9 Q36 10 35 14Z" fill="#3d2b1a"/>
           <!-- Scarf blowing -->
-          <path d="M38 24 Q30 28 25 22 Q20 26 15 24" fill="none" stroke="#ae0001" stroke-width="3" stroke-linecap="round"/>
+          <path class="preview-scarf" d="M38 24 Q30 28 25 22 Q20 26 15 24" fill="none" stroke="#ae0001" stroke-width="3" stroke-linecap="round"/>
           <!-- Glasses -->
           <circle cx="41" cy="15" r="3" fill="none" stroke="#333" stroke-width="1"/>
           <circle cx="49" cy="15" r="3" fill="none" stroke="#333" stroke-width="1"/>
@@ -74,17 +77,17 @@
 
       <div class="house-select">
         <p class="select-label">Wybierz swój dom:</p>
-        <div class="house-buttons">
-          <button class="house-btn gryffindor-btn selected" onclick="selectHouse('gryffindor')" data-house="gryffindor">
+        <div class="house-buttons" id="house-buttons">
+          <button class="house-btn gryffindor-btn selected" data-house="gryffindor">
             <span class="house-icon">🦁</span> Gryffindor
           </button>
-          <button class="house-btn hufflepuff-btn" onclick="selectHouse('hufflepuff')" data-house="hufflepuff">
+          <button class="house-btn hufflepuff-btn" data-house="hufflepuff">
             <span class="house-icon">🦡</span> Hufflepuff
           </button>
-          <button class="house-btn ravenclaw-btn" onclick="selectHouse('ravenclaw')" data-house="ravenclaw">
+          <button class="house-btn ravenclaw-btn" data-house="ravenclaw">
             <span class="house-icon">🦅</span> Ravenclaw
           </button>
-          <button class="house-btn slytherin-btn" onclick="selectHouse('slytherin')" data-house="slytherin">
+          <button class="house-btn slytherin-btn" data-house="slytherin">
             <span class="house-icon">🐍</span> Slytherin
           </button>
         </div>
