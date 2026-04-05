@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiara Przydziału</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="sorting-hat.css">
+</head>
+<body>
+  <div class="container">
+    <a href="../" class="back-link">Powrót do Magicznego Świata</a>
+
+    <div id="intro" class="screen">
+      <h1>Tiara Przydziału</h1>
+      <p class="subtitle">Usiądź, włóż mnie na głowę, a powiem ci, gdzie twoje miejsce...</p>
+      <div class="hat-icon">🎩</div>
+      <button class="magic-btn" onclick="startQuiz()">Rozpocznij Przydział!</button>
+    </div>
+
+    <div id="quiz" class="screen hidden">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+      <div id="question-container">
+        <h2 id="question-text"></h2>
+        <div id="answers" class="answers"></div>
+      </div>
+    </div>
+
+    <div id="result" class="screen hidden">
+      <h1>Tiara Przydziału zdecydowała!</h1>
+      <div id="house-crest" class="house-crest"></div>
+      <h2 id="house-name" class="house-title"></h2>
+      <p id="house-description" class="house-desc"></p>
+      <div class="result-actions">
+        <button class="magic-btn" onclick="resetQuiz()">Spróbuj ponownie</button>
+        <a href="../" class="magic-btn secondary">Strona główna</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="sorting-hat.js"></script>
+</body>
+</html>
