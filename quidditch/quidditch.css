@@ -485,6 +485,40 @@
   flex-wrap: wrap;
 }
 
+/* ===== Touch Multiplayer Split ===== */
+
+.touch-divider {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(212, 168, 67, 0.25);
+  z-index: 1;
+  pointer-events: none;
+  border-left: 1px dashed rgba(212, 168, 67, 0.3);
+}
+
+.touch-zone-label {
+  position: absolute;
+  top: 8px;
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 0.75rem;
+  color: rgba(212, 168, 67, 0.35);
+  pointer-events: none;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.touch-zone-left {
+  left: 12px;
+}
+
+.touch-zone-right {
+  right: 12px;
+}
+
 /* ===== Responsive ===== */
 
 @media (max-width: 1024px) and (min-width: 601px) {

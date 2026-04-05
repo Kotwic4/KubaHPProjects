@@ -40,9 +40,13 @@ let snitchCatchable = true;
 // Pozycje graczy
 let p1x = 0, p1y = 0;
 let p2x = 0, p2y = 0;
-// Cel myszy/dotyku (solo)
+// Cel myszy/dotyku
 let targetX = 0, targetY = 0;
 let usingMouse = false;
+// Dotyk w trybie multi (split-screen)
+let p1TargetX = 0, p1TargetY = 0, p1Touching = false;
+let p2TargetX = 0, p2TargetY = 0, p2Touching = false;
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
 // Znicz
 let snitchX = 0, snitchY = 0;
@@ -85,9 +89,10 @@ document.getElementById("mode-buttons").addEventListener("pointerdown", function
   document.getElementById("p1-name-label").textContent = multiMode ? "Imię gracza 1:" : "Twoje imię:";
   document.getElementById("p1-house-label").textContent = multiMode ? "Gracz 1 - wybierz dom (WASD):" : "Wybierz swój dom:";
   document.getElementById("controls-hint").textContent = multiMode
-    ? "Gracz 1: WASD | Gracz 2: Strzałki"
+    ? (isTouchDevice ? "Gracz 1: lewa strona ekranu | Gracz 2: prawa strona" : "Gracz 1: WASD | Gracz 2: Strzałki")
     : "Steruj strzałkami lub WASD na klawiaturze, albo palcem na ekranie dotykowym!";
-  document.getElementById("preview-label-p1").textContent = multiMode ? "WASD" : "";
+  document.getElementById("preview-label-p1").textContent = multiMode ? (isTouchDevice ? "Lewo" : "WASD") : "";
+  document.getElementById("preview-label-p2").textContent = multiMode ? (isTouchDevice ? "Prawo" : "Strzałki") : "Strzałki";
 });
 
 // === Wybór domu P1 ===
@@ -151,6 +156,13 @@ function startGame(diff) {
   timerEl.classList.remove("warning");
   keysP1.up = keysP1.down = keysP1.left = keysP1.right = false;
   keysP2.up = keysP2.down = keysP2.left = keysP2.right = false;
+  p1Touching = false;
+  p2Touching = false;
+
+  // Pokaż/ukryj linię podziału ekranu dotykowego
+  document.getElementById("touch-divider").classList.toggle("hidden", !(multiMode && isTouchDevice));
+  document.getElementById("touch-label-p1").classList.toggle("hidden", !(multiMode && isTouchDevice));
+  document.getElementById("touch-label-p2").classList.toggle("hidden", !(multiMode && isTouchDevice));
 
   // Ustaw etykiety HUD
   document.getElementById("score-label").textContent = multiMode ? p1Name : "Złapane";
@@ -241,6 +253,7 @@ function gameLoop() {
   let p1dx = 0;
   if (keysP1.left || keysP1.right || keysP1.up || keysP1.down) {
     usingMouse = false;
+    p1Touching = false;
     const r = movePlayer(p1x, p1y, keysP1, difficulty.playerSpeed);
     p1x = r.x; p1y = r.y; p1dx = r.dx;
   } else if (!multiMode && usingMouse) {
@@ -253,13 +266,36 @@ function gameLoop() {
       p1y += (dy / dist) * speed;
     }
     p1dx = dx;
+  } else if (multiMode && p1Touching) {
+    const dx = p1TargetX - p1x;
+    const dy = p1TargetY - p1y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 2) {
+      const speed = Math.min(difficulty.playerSpeed, dist * 0.15);
+      p1x += (dx / dist) * speed;
+      p1y += (dy / dist) * speed;
+    }
+    p1dx = dx;
   }
 
   // Ruch gracza 2 (multi)
   let p2dx = 0;
   if (multiMode) {
-    const r = movePlayer(p2x, p2y, keysP2, difficulty.playerSpeed);
-    p2x = r.x; p2y = r.y; p2dx = r.dx;
+    if (keysP2.left || keysP2.right || keysP2.up || keysP2.down) {
+      p2Touching = false;
+      const r = movePlayer(p2x, p2y, keysP2, difficulty.playerSpeed);
+      p2x = r.x; p2y = r.y; p2dx = r.dx;
+    } else if (p2Touching) {
+      const dx = p2TargetX - p2x;
+      const dy = p2TargetY - p2y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 2) {
+        const speed = Math.min(difficulty.playerSpeed, dist * 0.15);
+        p2x += (dx / dist) * speed;
+        p2y += (dy / dist) * speed;
+      }
+      p2dx = dx;
+    }
   }
 
   // Ruch znicza
@@ -403,28 +439,55 @@ field.addEventListener("mousemove", function (e) {
   targetY = Math.max(0, Math.min(fieldH - 40, targetY));
 });
 
-field.addEventListener("touchmove", function (e) {
-  if (!gameRunning || multiMode) return;
-  usingMouse = true;
+function handleTouch(e) {
+  if (!gameRunning) return;
   e.preventDefault();
-  const t = e.touches[0];
   const rect = field.getBoundingClientRect();
-  targetX = t.clientX - rect.left - 40;
-  targetY = t.clientY - rect.top - 20;
-  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
-  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
-}, { passive: false });
 
-field.addEventListener("touchstart", function (e) {
-  if (!gameRunning || multiMode) return;
-  usingMouse = true;
+  if (multiMode) {
+    // Split-screen: lewa połowa = P1, prawa połowa = P2
+    const midX = rect.width / 2;
+    p1Touching = false;
+    p2Touching = false;
+    for (let i = 0; i < e.touches.length; i++) {
+      const t = e.touches[i];
+      const tx = t.clientX - rect.left;
+      const ty = t.clientY - rect.top;
+      if (tx < midX) {
+        p1Touching = true;
+        p1TargetX = Math.max(0, Math.min(fieldW - 80, tx - 40));
+        p1TargetY = Math.max(0, Math.min(fieldH - 40, ty - 20));
+      } else {
+        p2Touching = true;
+        p2TargetX = Math.max(0, Math.min(fieldW - 80, tx - 40));
+        p2TargetY = Math.max(0, Math.min(fieldH - 40, ty - 20));
+      }
+    }
+  } else {
+    usingMouse = true;
+    const t = e.touches[0];
+    targetX = t.clientX - rect.left - 40;
+    targetY = t.clientY - rect.top - 20;
+    targetX = Math.max(0, Math.min(fieldW - 80, targetX));
+    targetY = Math.max(0, Math.min(fieldH - 40, targetY));
+  }
+}
+
+field.addEventListener("touchstart", handleTouch, { passive: false });
+field.addEventListener("touchmove", handleTouch, { passive: false });
+field.addEventListener("touchend", function (e) {
+  if (!gameRunning || !multiMode) return;
   e.preventDefault();
-  const t = e.touches[0];
   const rect = field.getBoundingClientRect();
-  targetX = t.clientX - rect.left - 40;
-  targetY = t.clientY - rect.top - 20;
-  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
-  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
+  const midX = rect.width / 2;
+  p1Touching = false;
+  p2Touching = false;
+  for (let i = 0; i < e.touches.length; i++) {
+    const t = e.touches[i];
+    const tx = t.clientX - rect.left;
+    if (tx < midX) p1Touching = true;
+    else p2Touching = true;
+  }
 }, { passive: false });
 
 // === Efekty ===
