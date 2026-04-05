@@ -26,6 +26,8 @@ const messages = [
 let multiMode = false;
 let p1House = "gryffindor";
 let p2House = "slytherin";
+let p1Name = "";
+let p2Name = "";
 let score1 = 0;
 let score2 = 0;
 let timeLeft = GAME_DURATION;
@@ -75,10 +77,12 @@ document.getElementById("mode-buttons").addEventListener("pointerdown", function
 
   // Pokaż/ukryj elementy gracza 2
   document.getElementById("p2-house-section").classList.toggle("hidden", !multiMode);
+  document.getElementById("p2-name-section").classList.toggle("hidden", !multiMode);
   document.getElementById("preview-p2").classList.toggle("hidden", !multiMode);
   document.getElementById("vs2-text").classList.toggle("hidden", !multiMode);
 
-  // Aktualizuj etykietę
+  // Aktualizuj etykiety
+  document.getElementById("p1-name-label").textContent = multiMode ? "Imię gracza 1:" : "Twoje imię:";
   document.getElementById("p1-house-label").textContent = multiMode ? "Gracz 1 - wybierz dom (WASD):" : "Wybierz swój dom:";
   document.getElementById("controls-hint").textContent = multiMode
     ? "Gracz 1: WASD | Gracz 2: Strzałki"
@@ -137,6 +141,10 @@ function startGame(diff) {
   snitchCatchable = true;
   usingMouse = false;
 
+  // Odczytaj imiona
+  p1Name = document.getElementById("p1-name").value.trim() || (multiMode ? "Gracz 1" : "");
+  p2Name = document.getElementById("p2-name").value.trim() || "Gracz 2";
+
   scoreEl.textContent = "0";
   score2El.textContent = "0";
   timerEl.textContent = GAME_DURATION;
@@ -145,7 +153,8 @@ function startGame(diff) {
   keysP2.up = keysP2.down = keysP2.left = keysP2.right = false;
 
   // Ustaw etykiety HUD
-  document.getElementById("score-label").textContent = multiMode ? "Gracz 1" : "Złapane";
+  document.getElementById("score-label").textContent = multiMode ? p1Name : "Złapane";
+  document.getElementById("score2-label").textContent = p2Name;
   document.getElementById("score2-hud").classList.toggle("hidden", !multiMode);
 
   document.getElementById("intro").classList.add("hidden");
@@ -452,25 +461,26 @@ function endGame() {
 
   if (multiMode) {
     if (score1 > score2) {
-      titleEl.textContent = "Gracz 1 wygrywa!";
-      scoreText.textContent = "Gracz 1 złapał " + score1 + " razy, Gracz 2 złapał " + score2 + " razy.";
-      msgEl.textContent = "Świetna gra! Gracz 1 okazał się lepszym szukającym!";
+      titleEl.textContent = p1Name + " wygrywa!";
+      scoreText.textContent = p1Name + " złapał(a) " + score1 + " razy, " + p2Name + " złapał(a) " + score2 + " razy.";
+      msgEl.textContent = "Świetna gra! " + p1Name + " okazał(a) się lepszym szukającym!";
     } else if (score2 > score1) {
-      titleEl.textContent = "Gracz 2 wygrywa!";
-      scoreText.textContent = "Gracz 2 złapał " + score2 + " razy, Gracz 1 złapał " + score1 + " razy.";
-      msgEl.textContent = "Świetna gra! Gracz 2 okazał się lepszym szukającym!";
+      titleEl.textContent = p2Name + " wygrywa!";
+      scoreText.textContent = p2Name + " złapał(a) " + score2 + " razy, " + p1Name + " złapał(a) " + score1 + " razy.";
+      msgEl.textContent = "Świetna gra! " + p2Name + " okazał(a) się lepszym szukającym!";
     } else {
       titleEl.textContent = "Remis!";
-      scoreText.textContent = "Obaj złapaliście Znicza " + score1 + " razy!";
+      scoreText.textContent = p1Name + " i " + p2Name + " złapali Znicza po " + score1 + " razy!";
       msgEl.textContent = "Niesamowite! Obaj jesteście równie dobrymi szukającymi!";
     }
   } else {
-    scoreText.textContent = "Złapałeś Znicza " + score1 + " razy!";
+    const name = p1Name || "Ty";
+    scoreText.textContent = (p1Name ? p1Name + " złapał(a)" : "Złapałeś") + " Znicza " + score1 + " razy!";
 
     if (score1 === 0) titleEl.textContent = "Koniec czasu!";
-    else if (score1 < 7) titleEl.textContent = "Niezła próba!";
-    else if (score1 < 13) titleEl.textContent = "Świetna gra!";
-    else titleEl.textContent = "NIESAMOWITE!";
+    else if (score1 < 7) titleEl.textContent = "Niezła próba" + (p1Name ? ", " + p1Name : "") + "!";
+    else if (score1 < 13) titleEl.textContent = "Świetna gra" + (p1Name ? ", " + p1Name : "") + "!";
+    else titleEl.textContent = "NIESAMOWITE" + (p1Name ? ", " + p1Name : "") + "!";
 
     const msg = messages.find((m) => score1 >= m.min && score1 <= m.max);
     msgEl.textContent = msg ? msg.text : "";
