@@ -2,24 +2,16 @@ const GAME_DURATION = 30;
 const CATCH_DISTANCE = 40;
 
 const DIFFICULTY = {
-  easy: {
-    snitchSpeed: 1.5,
-    speedIncrease: 0.12,
-    playerSpeed: 5,
-    changeInterval: 2500,
-  },
-  medium: {
-    snitchSpeed: 2.5,
-    speedIncrease: 0.2,
-    playerSpeed: 5.5,
-    changeInterval: 1800,
-  },
-  hard: {
-    snitchSpeed: 4,
-    speedIncrease: 0.3,
-    playerSpeed: 6,
-    changeInterval: 1200,
-  },
+  easy: { snitchSpeed: 1.5, speedIncrease: 0.12, playerSpeed: 5, changeInterval: 2500 },
+  medium: { snitchSpeed: 2.5, speedIncrease: 0.2, playerSpeed: 5.5, changeInterval: 1800 },
+  hard: { snitchSpeed: 4, speedIncrease: 0.3, playerSpeed: 6, changeInterval: 1200 },
+};
+
+const HOUSE_COLORS = {
+  gryffindor: "#ae0001",
+  hufflepuff: "#ecb939",
+  ravenclaw: "#222f5b",
+  slytherin: "#2a623d",
 };
 
 const messages = [
@@ -30,131 +22,163 @@ const messages = [
   { min: 19, max: Infinity, text: "LEGENDA! Nawet Viktor Krum by ci zazdrościł! Absolutny rekord!" },
 ];
 
-const HOUSE_COLORS = {
-  gryffindor: "#ae0001",
-  hufflepuff: "#ecb939",
-  ravenclaw: "#222f5b",
-  slytherin: "#2a623d",
-};
-
-let selectedHouse = "gryffindor";
-let score = 0;
+// Stan gry
+let multiMode = false;
+let p1House = "gryffindor";
+let p2House = "slytherin";
+let score1 = 0;
+let score2 = 0;
 let timeLeft = GAME_DURATION;
 let gameTimer = null;
 let animFrameId = null;
-let bestScore = parseInt(localStorage.getItem("snitch-best") || "0");
 let difficulty = null;
 let gameRunning = false;
+let snitchCatchable = true;
 
-// Pozycje
-let playerX = 0;
-let playerY = 0;
-let targetPlayerX = 0;
-let targetPlayerY = 0;
+// Pozycje graczy
+let p1x = 0, p1y = 0;
+let p2x = 0, p2y = 0;
+// Cel myszy/dotyku (solo)
+let targetX = 0, targetY = 0;
+let usingMouse = false;
 
-let snitchX = 0;
-let snitchY = 0;
-let snitchTargetX = 0;
-let snitchTargetY = 0;
+// Znicz
+let snitchX = 0, snitchY = 0;
+let snitchTargetX = 0, snitchTargetY = 0;
 let snitchSpeed = 0;
 let snitchChangeTimer = null;
 
-let fieldW = 0;
-let fieldH = 0;
+let fieldW = 0, fieldH = 0;
 
-// Klawiatura - strzałki
-const keys = { up: false, down: false, left: false, right: false };
-let usingKeys = false;
+// Klawisze
+const keysP1 = { up: false, down: false, left: false, right: false };
+const keysP2 = { up: false, down: false, left: false, right: false };
 
+// Elementy DOM
 const field = document.getElementById("field");
-const player = document.getElementById("player");
-const snitch = document.getElementById("snitch");
+const player1El = document.getElementById("player1");
+const player2El = document.getElementById("player2");
+const snitchEl = document.getElementById("snitch");
 const scoreEl = document.getElementById("score");
+const score2El = document.getElementById("score2");
 const timerEl = document.getElementById("timer");
-const bestEl = document.getElementById("best");
 const catchEffect = document.getElementById("catchEffect");
 
-bestEl.textContent = bestScore;
+// === Wybór trybu ===
+document.getElementById("mode-buttons").addEventListener("pointerdown", function (e) {
+  const btn = e.target.closest(".mode-btn");
+  if (!btn) return;
+  e.preventDefault();
+  const mode = btn.dataset.mode;
+  multiMode = (mode === "multi");
+  document.querySelectorAll(".mode-btn").forEach((b) => b.classList.toggle("selected", b.dataset.mode === mode));
 
-// Wybór domu - event listener działa na telefonie i komputerze
-document.getElementById("house-buttons").addEventListener("pointerdown", function (e) {
+  // Pokaż/ukryj elementy gracza 2
+  document.getElementById("p2-house-section").classList.toggle("hidden", !multiMode);
+  document.getElementById("preview-p2").classList.toggle("hidden", !multiMode);
+  document.getElementById("vs2-text").classList.toggle("hidden", !multiMode);
+
+  // Aktualizuj etykietę
+  document.getElementById("p1-house-label").textContent = multiMode ? "Gracz 1 - wybierz dom (WASD):" : "Wybierz swój dom:";
+  document.getElementById("controls-hint").textContent = multiMode
+    ? "Gracz 1: WASD | Gracz 2: Strzałki"
+    : "Steruj strzałkami lub WASD na klawiaturze, albo palcem na ekranie dotykowym!";
+  document.getElementById("preview-label-p1").textContent = multiMode ? "WASD" : "";
+});
+
+// === Wybór domu P1 ===
+document.getElementById("house-buttons-p1").addEventListener("pointerdown", function (e) {
   const btn = e.target.closest(".house-btn");
   if (!btn) return;
   e.preventDefault();
-  selectHouse(btn.dataset.house);
+  p1House = btn.dataset.house;
+  this.querySelectorAll(".house-btn").forEach((b) => b.classList.toggle("selected", b.dataset.house === p1House));
+  updatePreview();
 });
 
-function selectHouse(house) {
-  selectedHouse = house;
-  document.querySelectorAll(".house-btn").forEach((btn) => {
-    btn.classList.toggle("selected", btn.dataset.house === house);
-  });
-  // Aktualizuj podgląd postaci
-  updatePreviewColors();
+// === Wybór domu P2 ===
+document.getElementById("house-buttons-p2").addEventListener("pointerdown", function (e) {
+  const btn = e.target.closest(".house-btn");
+  if (!btn) return;
+  e.preventDefault();
+  p2House = btn.dataset.house;
+  this.querySelectorAll(".house-btn").forEach((b) => b.classList.toggle("selected", b.dataset.house === p2House));
+  updatePreview();
+});
+
+function updatePreview() {
+  const c1 = HOUSE_COLORS[p1House];
+  const p1svg = document.getElementById("broom-preview-p1");
+  p1svg.querySelector(".preview-robe").setAttribute("fill", c1);
+  p1svg.querySelector(".preview-scarf").setAttribute("stroke", c1);
+
+  const c2 = HOUSE_COLORS[p2House];
+  const p2svg = document.getElementById("broom-preview-p2");
+  p2svg.querySelector(".preview-robe").setAttribute("fill", c2);
+  p2svg.querySelector(".preview-scarf").setAttribute("stroke", c2);
 }
 
-function updatePreviewColors() {
-  const color = HOUSE_COLORS[selectedHouse];
-  document.querySelectorAll(".preview-scarf").forEach((s) => {
-    s.setAttribute("stroke", color);
-  });
-  document.querySelectorAll(".preview-robe").forEach((r) => {
-    r.setAttribute("fill", color);
-    r.setAttribute("opacity", "0.7");
-  });
+function applyPlayerColors(playerEl, house) {
+  const color = HOUSE_COLORS[house];
+  playerEl.querySelector(".scarf").setAttribute("stroke", color);
+  playerEl.querySelector(".robe").setAttribute("fill", color);
+  playerEl.querySelector(".robe").setAttribute("opacity", "0.7");
 }
 
-function applyHouseColors() {
-  const color = HOUSE_COLORS[selectedHouse];
-  document.querySelectorAll("#player .scarf").forEach((s) => {
-    s.setAttribute("stroke", color);
-  });
-  document.querySelectorAll("#player .robe").forEach((r) => {
-    r.setAttribute("fill", color);
-    r.setAttribute("opacity", "0.7");
-  });
-}
-
-// Ustaw kolory podglądu na start
-updatePreviewColors();
+// === Gra ===
 
 function startGame(diff) {
   difficulty = DIFFICULTY[diff];
-  score = 0;
+  score1 = 0;
+  score2 = 0;
   timeLeft = GAME_DURATION;
   snitchSpeed = difficulty.snitchSpeed;
   gameRunning = true;
+  snitchCatchable = true;
+  usingMouse = false;
 
   scoreEl.textContent = "0";
+  score2El.textContent = "0";
   timerEl.textContent = GAME_DURATION;
   timerEl.classList.remove("warning");
-  bestEl.textContent = bestScore;
-  keys.up = keys.down = keys.left = keys.right = false;
-  usingKeys = false;
+  keysP1.up = keysP1.down = keysP1.left = keysP1.right = false;
+  keysP2.up = keysP2.down = keysP2.left = keysP2.right = false;
+
+  // Ustaw etykiety HUD
+  document.getElementById("score-label").textContent = multiMode ? "Gracz 1" : "Złapane";
+  document.getElementById("score2-hud").classList.toggle("hidden", !multiMode);
 
   document.getElementById("intro").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
 
-  applyHouseColors();
+  // Pokaż/ukryj gracza 2
+  player2El.classList.toggle("hidden", !multiMode);
+
+  applyPlayerColors(player1El, p1House);
+  if (multiMode) applyPlayerColors(player2El, p2House);
 
   const rect = field.getBoundingClientRect();
   fieldW = rect.width;
   fieldH = rect.height;
 
-  // Gracz startuje na środku-lewo
-  playerX = fieldW * 0.25;
-  playerY = fieldH * 0.5;
-  targetPlayerX = playerX;
-  targetPlayerY = playerY;
+  // Pozycje startowe
+  p1x = fieldW * 0.2;
+  p1y = fieldH * 0.5;
+  targetX = p1x;
+  targetY = p1y;
 
-  // Znicz startuje na środku-prawo
-  snitchX = fieldW * 0.7;
-  snitchY = fieldH * 0.4;
+  if (multiMode) {
+    p2x = fieldW * 0.8 - 80;
+    p2y = fieldH * 0.5;
+  }
+
+  snitchX = fieldW * 0.5 - 27;
+  snitchY = fieldH * 0.3;
   pickNewSnitchTarget();
 
-  snitch.classList.remove("caught");
-  snitch.style.opacity = "1";
+  snitchEl.classList.remove("caught");
+  snitchEl.style.opacity = "1";
   updatePositions();
 
   gameTimer = setInterval(tick, 1000);
@@ -170,74 +194,69 @@ function tick() {
 }
 
 function pickNewSnitchTarget() {
-  const padding = 25;
-  snitchTargetX = padding + Math.random() * (fieldW - 55 - padding * 2);
-  snitchTargetY = padding + Math.random() * (fieldH - 28 - padding * 2);
+  const pad = 25;
+  snitchTargetX = pad + Math.random() * (fieldW - 55 - pad * 2);
+  snitchTargetY = pad + Math.random() * (fieldH - 28 - pad * 2);
 }
 
-// Znicz ucieka od gracza gdy jest blisko
-function snitchFlee() {
-  const dx = snitchX - playerX;
-  const dy = snitchY - playerY;
+function snitchFleeFrom(px, py) {
+  const dx = snitchX - px;
+  const dy = snitchY - py;
   const dist = Math.sqrt(dx * dx + dy * dy);
-
   if (dist < 100) {
-    // Ucieka w przeciwnym kierunku od gracza
     const angle = Math.atan2(dy, dx);
-    const fleeDist = 100 + Math.random() * 80;
-    snitchTargetX = snitchX + Math.cos(angle) * fleeDist;
-    snitchTargetY = snitchY + Math.sin(angle) * fleeDist;
-
-    // Nie wylatuj za pole
-    snitchTargetX = Math.max(20, Math.min(fieldW - 75, snitchTargetX));
-    snitchTargetY = Math.max(20, Math.min(fieldH - 48, snitchTargetY));
+    const flee = 100 + Math.random() * 80;
+    snitchTargetX = Math.max(20, Math.min(fieldW - 75, snitchX + Math.cos(angle) * flee));
+    snitchTargetY = Math.max(20, Math.min(fieldH - 48, snitchY + Math.sin(angle) * flee));
   }
+}
+
+function movePlayer(px, py, keys, speed) {
+  let dx = 0, dy = 0;
+  if (keys.left) dx -= speed;
+  if (keys.right) dx += speed;
+  if (keys.up) dy -= speed;
+  if (keys.down) dy += speed;
+  if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
+  px += dx;
+  py += dy;
+  px = Math.max(0, Math.min(fieldW - 80, px));
+  py = Math.max(0, Math.min(fieldH - 40, py));
+  return { x: px, y: py, dx };
 }
 
 function gameLoop() {
   if (!gameRunning) return;
 
-  // Ruch gracza
-  let pdx = 0;
-  let pdy = 0;
-
-  if (usingKeys) {
-    // Sterowanie strzałkami / WASD
-    if (keys.left) pdx -= difficulty.playerSpeed;
-    if (keys.right) pdx += difficulty.playerSpeed;
-    if (keys.up) pdy -= difficulty.playerSpeed;
-    if (keys.down) pdy += difficulty.playerSpeed;
-
-    // Normalizuj ruch po skosie
-    if (pdx !== 0 && pdy !== 0) {
-      pdx *= 0.707;
-      pdy *= 0.707;
+  // Ruch gracza 1
+  let p1dx = 0;
+  if (keysP1.left || keysP1.right || keysP1.up || keysP1.down) {
+    usingMouse = false;
+    const r = movePlayer(p1x, p1y, keysP1, difficulty.playerSpeed);
+    p1x = r.x; p1y = r.y; p1dx = r.dx;
+  } else if (!multiMode && usingMouse) {
+    const dx = targetX - p1x;
+    const dy = targetY - p1y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 2) {
+      const speed = Math.min(difficulty.playerSpeed, dist * 0.15);
+      p1x += (dx / dist) * speed;
+      p1y += (dy / dist) * speed;
     }
-
-    playerX += pdx;
-    playerY += pdy;
-
-    // Nie wylatuj za pole
-    playerX = Math.max(0, Math.min(fieldW - 80, playerX));
-    playerY = Math.max(0, Math.min(fieldH - 40, playerY));
-  } else {
-    // Sterowanie myszką/dotykiem
-    pdx = targetPlayerX - playerX;
-    pdy = targetPlayerY - playerY;
-    const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
-
-    if (pDist > 2) {
-      const speed = Math.min(difficulty.playerSpeed, pDist * 0.15);
-      playerX += (pdx / pDist) * speed;
-      playerY += (pdy / pDist) * speed;
-    }
+    p1dx = dx;
   }
 
-  // Znicz leci w stronę swojego celu
+  // Ruch gracza 2 (multi)
+  let p2dx = 0;
+  if (multiMode) {
+    const r = movePlayer(p2x, p2y, keysP2, difficulty.playerSpeed);
+    p2x = r.x; p2y = r.y; p2dx = r.dx;
+  }
+
+  // Ruch znicza
   const sdx = snitchTargetX - snitchX;
   const sdy = snitchTargetY - snitchY;
   const sDist = Math.sqrt(sdx * sdx + sdy * sdy);
-
   if (sDist > 2) {
     snitchX += (sdx / sDist) * snitchSpeed;
     snitchY += (sdy / sDist) * snitchSpeed;
@@ -245,141 +264,161 @@ function gameLoop() {
     pickNewSnitchTarget();
   }
 
-  // Znicz ucieka gdy gracz jest blisko
-  snitchFlee();
+  // Znicz ucieka od graczy
+  snitchFleeFrom(p1x + 40, p1y + 20);
+  if (multiMode) snitchFleeFrom(p2x + 40, p2y + 20);
 
-  // Odwracamy gracza w stronę ruchu
-  if (usingKeys) {
-    if (keys.left) player.classList.add("facing-left");
-    else if (keys.right) player.classList.remove("facing-left");
-  } else {
-    if (pdx < -2) player.classList.add("facing-left");
-    else if (pdx > 2) player.classList.remove("facing-left");
+  // Kierunek graczy
+  if (p1dx < -1) player1El.classList.add("facing-left");
+  else if (p1dx > 1) player1El.classList.remove("facing-left");
+
+  if (multiMode) {
+    if (p2dx < -1) player2El.classList.add("facing-left");
+    else if (p2dx > 1) player2El.classList.remove("facing-left");
   }
 
-  // Sprawdzamy kolizję (złapanie znicza)
-  const cx = (playerX + 40) - (snitchX + 27);
-  const cy = (playerY + 20) - (snitchY + 14);
-  const catchDist = Math.sqrt(cx * cx + cy * cy);
+  // Kolizje
+  if (snitchCatchable) {
+    const d1 = distToSnitch(p1x, p1y);
+    const d2 = multiMode ? distToSnitch(p2x, p2y) : Infinity;
 
-  if (catchDist < CATCH_DISTANCE) {
-    catchSnitch();
+    if (d1 < CATCH_DISTANCE || d2 < CATCH_DISTANCE) {
+      // Kto był bliżej?
+      if (d1 <= d2) {
+        score1++;
+        scoreEl.textContent = score1;
+      } else {
+        score2++;
+        score2El.textContent = score2;
+      }
+      onCatch();
+    }
   }
 
   updatePositions();
   animFrameId = requestAnimationFrame(gameLoop);
 }
 
-function updatePositions() {
-  player.style.left = playerX + "px";
-  player.style.top = playerY + "px";
-  snitch.style.left = snitchX + "px";
-  snitch.style.top = snitchY + "px";
+function distToSnitch(px, py) {
+  const cx = (px + 40) - (snitchX + 27);
+  const cy = (py + 20) - (snitchY + 14);
+  return Math.sqrt(cx * cx + cy * cy);
 }
 
-// Sterowanie - klawiatura (strzałki + WASD)
-document.addEventListener("keydown", function (e) {
-  if (!gameRunning) return;
-  const key = e.key;
-  if (key === "ArrowUp" || key === "w" || key === "W") { keys.up = true; usingKeys = true; e.preventDefault(); }
-  if (key === "ArrowDown" || key === "s" || key === "S") { keys.down = true; usingKeys = true; e.preventDefault(); }
-  if (key === "ArrowLeft" || key === "a" || key === "A") { keys.left = true; usingKeys = true; e.preventDefault(); }
-  if (key === "ArrowRight" || key === "d" || key === "D") { keys.right = true; usingKeys = true; e.preventDefault(); }
-});
+function onCatch() {
+  snitchCatchable = false;
 
-document.addEventListener("keyup", function (e) {
-  const key = e.key;
-  if (key === "ArrowUp" || key === "w" || key === "W") keys.up = false;
-  if (key === "ArrowDown" || key === "s" || key === "S") keys.down = false;
-  if (key === "ArrowLeft" || key === "a" || key === "A") keys.left = false;
-  if (key === "ArrowRight" || key === "d" || key === "D") keys.right = false;
-});
-
-// Sterowanie - mysz
-field.addEventListener("mousemove", function (e) {
-  usingKeys = false;
-  if (!gameRunning) return;
-  const rect = field.getBoundingClientRect();
-  targetPlayerX = e.clientX - rect.left - 40;
-  targetPlayerY = e.clientY - rect.top - 20;
-  clampTarget();
-});
-
-// Sterowanie - dotyk
-field.addEventListener("touchmove", function (e) {
-  if (!gameRunning) return;
-  usingKeys = false;
-  e.preventDefault();
-  const touch = e.touches[0];
-  const rect = field.getBoundingClientRect();
-  targetPlayerX = touch.clientX - rect.left - 40;
-  targetPlayerY = touch.clientY - rect.top - 20;
-  clampTarget();
-}, { passive: false });
-
-field.addEventListener("touchstart", function (e) {
-  if (!gameRunning) return;
-  usingKeys = false;
-  e.preventDefault();
-  const touch = e.touches[0];
-  const rect = field.getBoundingClientRect();
-  targetPlayerX = touch.clientX - rect.left - 40;
-  targetPlayerY = touch.clientY - rect.top - 20;
-  clampTarget();
-}, { passive: false });
-
-function clampTarget() {
-  targetPlayerX = Math.max(0, Math.min(fieldW - 80, targetPlayerX));
-  targetPlayerY = Math.max(0, Math.min(fieldH - 40, targetPlayerY));
-}
-
-function catchSnitch() {
-  score++;
-  scoreEl.textContent = score;
-
-  // Iskry
   spawnSparks(snitchX + 27, snitchY + 14);
 
-  // Efekt +1
   catchEffect.style.left = snitchX + 15 + "px";
   catchEffect.style.top = snitchY - 10 + "px";
   catchEffect.classList.remove("show");
   void catchEffect.offsetWidth;
   catchEffect.classList.add("show");
 
-  // Znicz znika
-  snitch.classList.add("caught");
-
-  // Szybszy znicz
+  snitchEl.classList.add("caught");
   snitchSpeed += difficulty.speedIncrease;
 
-  // Częściej zmienia kierunek
   clearInterval(snitchChangeTimer);
-  const newInterval = Math.max(600, difficulty.changeInterval - score * 40);
+  const totalCatches = score1 + score2;
+  const newInterval = Math.max(600, difficulty.changeInterval - totalCatches * 40);
   snitchChangeTimer = setInterval(pickNewSnitchTarget, newInterval);
 
-  // Znicz pojawia się w nowym miejscu (daleko od gracza)
   setTimeout(() => {
     respawnSnitch();
-    snitch.classList.remove("caught");
-    snitch.style.opacity = "1";
+    snitchEl.classList.remove("caught");
+    snitchEl.style.opacity = "1";
+    snitchCatchable = true;
   }, 500);
 }
 
 function respawnSnitch() {
-  // Znicz pojawia się w losowym miejscu, ale daleko od gracza
-  let attempts = 0;
-  do {
+  for (let i = 0; i < 20; i++) {
     snitchX = 30 + Math.random() * (fieldW - 115);
     snitchY = 30 + Math.random() * (fieldH - 68);
-    const dx = snitchX - playerX;
-    const dy = snitchY - playerY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > 150 || attempts > 10) break;
-    attempts++;
-  } while (true);
+    const d1 = Math.sqrt((snitchX - p1x) ** 2 + (snitchY - p1y) ** 2);
+    const d2 = multiMode ? Math.sqrt((snitchX - p2x) ** 2 + (snitchY - p2y) ** 2) : 999;
+    if (d1 > 120 && d2 > 120) break;
+  }
   pickNewSnitchTarget();
 }
+
+function updatePositions() {
+  player1El.style.left = p1x + "px";
+  player1El.style.top = p1y + "px";
+  if (multiMode) {
+    player2El.style.left = p2x + "px";
+    player2El.style.top = p2y + "px";
+  }
+  snitchEl.style.left = snitchX + "px";
+  snitchEl.style.top = snitchY + "px";
+}
+
+// === Sterowanie ===
+
+document.addEventListener("keydown", function (e) {
+  if (!gameRunning) return;
+  const k = e.key;
+  // WASD = Gracz 1
+  if (k === "w" || k === "W") { keysP1.up = true; e.preventDefault(); }
+  if (k === "s" || k === "S") { keysP1.down = true; e.preventDefault(); }
+  if (k === "a" || k === "A") { keysP1.left = true; e.preventDefault(); }
+  if (k === "d" || k === "D") { keysP1.right = true; e.preventDefault(); }
+  // Strzałki = Gracz 2 (multi) lub Gracz 1 (solo)
+  if (k === "ArrowUp") { (multiMode ? keysP2 : keysP1).up = true; e.preventDefault(); }
+  if (k === "ArrowDown") { (multiMode ? keysP2 : keysP1).down = true; e.preventDefault(); }
+  if (k === "ArrowLeft") { (multiMode ? keysP2 : keysP1).left = true; e.preventDefault(); }
+  if (k === "ArrowRight") { (multiMode ? keysP2 : keysP1).right = true; e.preventDefault(); }
+});
+
+document.addEventListener("keyup", function (e) {
+  const k = e.key;
+  if (k === "w" || k === "W") keysP1.up = false;
+  if (k === "s" || k === "S") keysP1.down = false;
+  if (k === "a" || k === "A") keysP1.left = false;
+  if (k === "d" || k === "D") keysP1.right = false;
+  if (k === "ArrowUp") { (multiMode ? keysP2 : keysP1).up = false; }
+  if (k === "ArrowDown") { (multiMode ? keysP2 : keysP1).down = false; }
+  if (k === "ArrowLeft") { (multiMode ? keysP2 : keysP1).left = false; }
+  if (k === "ArrowRight") { (multiMode ? keysP2 : keysP1).right = false; }
+});
+
+// Mysz/dotyk - tylko w trybie solo
+field.addEventListener("mousemove", function (e) {
+  if (!gameRunning || multiMode) return;
+  usingMouse = true;
+  const rect = field.getBoundingClientRect();
+  targetX = e.clientX - rect.left - 40;
+  targetY = e.clientY - rect.top - 20;
+  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
+  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
+});
+
+field.addEventListener("touchmove", function (e) {
+  if (!gameRunning || multiMode) return;
+  usingMouse = true;
+  e.preventDefault();
+  const t = e.touches[0];
+  const rect = field.getBoundingClientRect();
+  targetX = t.clientX - rect.left - 40;
+  targetY = t.clientY - rect.top - 20;
+  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
+  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
+}, { passive: false });
+
+field.addEventListener("touchstart", function (e) {
+  if (!gameRunning || multiMode) return;
+  usingMouse = true;
+  e.preventDefault();
+  const t = e.touches[0];
+  const rect = field.getBoundingClientRect();
+  targetX = t.clientX - rect.left - 40;
+  targetY = t.clientY - rect.top - 20;
+  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
+  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
+}, { passive: false });
+
+// === Efekty ===
 
 function spawnSparks(x, y) {
   for (let i = 0; i < 8; i++) {
@@ -397,44 +436,54 @@ function spawnSparks(x, y) {
   }
 }
 
+// === Koniec gry ===
+
 function endGame() {
   gameRunning = false;
   clearInterval(gameTimer);
   clearInterval(snitchChangeTimer);
   cancelAnimationFrame(animFrameId);
 
-  if (score > bestScore) {
-    bestScore = score;
-    localStorage.setItem("snitch-best", bestScore);
-  }
-
   document.getElementById("game").classList.add("hidden");
 
-  const resultTitle = document.getElementById("result-title");
-  const finalScore = document.getElementById("final-score");
-  const resultMsg = document.getElementById("result-msg");
+  const titleEl = document.getElementById("result-title");
+  const scoreText = document.getElementById("result-score-text");
+  const msgEl = document.getElementById("result-msg");
 
-  finalScore.textContent = score;
-
-  if (score === 0) {
-    resultTitle.textContent = "Koniec czasu!";
-  } else if (score < 7) {
-    resultTitle.textContent = "Niezła próba!";
-  } else if (score < 13) {
-    resultTitle.textContent = "Świetna gra!";
+  if (multiMode) {
+    if (score1 > score2) {
+      titleEl.textContent = "Gracz 1 wygrywa!";
+      scoreText.textContent = "Gracz 1 złapał " + score1 + " razy, Gracz 2 złapał " + score2 + " razy.";
+      msgEl.textContent = "Świetna gra! Gracz 1 okazał się lepszym szukającym!";
+    } else if (score2 > score1) {
+      titleEl.textContent = "Gracz 2 wygrywa!";
+      scoreText.textContent = "Gracz 2 złapał " + score2 + " razy, Gracz 1 złapał " + score1 + " razy.";
+      msgEl.textContent = "Świetna gra! Gracz 2 okazał się lepszym szukającym!";
+    } else {
+      titleEl.textContent = "Remis!";
+      scoreText.textContent = "Obaj złapaliście Znicza " + score1 + " razy!";
+      msgEl.textContent = "Niesamowite! Obaj jesteście równie dobrymi szukającymi!";
+    }
   } else {
-    resultTitle.textContent = "NIESAMOWITE!";
-  }
+    scoreText.textContent = "Złapałeś Znicza " + score1 + " razy!";
 
-  const msg = messages.find((m) => score >= m.min && score <= m.max);
-  resultMsg.textContent = msg ? msg.text : "";
+    if (score1 === 0) titleEl.textContent = "Koniec czasu!";
+    else if (score1 < 7) titleEl.textContent = "Niezła próba!";
+    else if (score1 < 13) titleEl.textContent = "Świetna gra!";
+    else titleEl.textContent = "NIESAMOWITE!";
+
+    const msg = messages.find((m) => score1 >= m.min && score1 <= m.max);
+    msgEl.textContent = msg ? msg.text : "";
+  }
 
   document.getElementById("result").classList.remove("hidden");
 }
 
 function backToIntro() {
-  bestEl.textContent = bestScore;
   document.getElementById("result").classList.add("hidden");
   document.getElementById("game").classList.add("hidden");
   document.getElementById("intro").classList.remove("hidden");
 }
+
+// Ustaw podgląd na start
+updatePreview();

@@ -24,14 +24,53 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===== Mode Select ===== */
+
+.mode-select {
+  margin-bottom: 1rem;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.mode-btn {
+  font-size: 0.95rem;
+  padding: 0.5rem 1.5rem;
+  opacity: 0.5;
+}
+
+.mode-btn.selected {
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(212, 168, 67, 0.4);
+}
+
 /* ===== Intro ===== */
 
 .intro-preview {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin: 1.5rem 0 1rem;
+  gap: 0.8rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.preview-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.preview-label {
+  font-size: 0.75rem;
+  color: var(--gold);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .broom-preview {
@@ -44,11 +83,20 @@
   50% { transform: translateY(-8px) rotate(3deg); }
 }
 
+#broom-preview-p2 {
+  animation: broomBob2 2s ease-in-out infinite;
+}
+
+@keyframes broomBob2 {
+  0%, 100% { transform: scaleX(-1) translateY(0) rotate(-3deg); }
+  50% { transform: scaleX(-1) translateY(-8px) rotate(3deg); }
+}
+
 .vs-text {
   font-family: 'Cinzel Decorative', cursive;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--gold);
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .snitch-preview-svg {
@@ -64,9 +112,9 @@
 }
 
 .controls-hint {
-  font-size: 0.95rem;
-  opacity: 0.6;
-  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  margin-bottom: 1rem;
   font-style: italic;
 }
 
@@ -75,13 +123,8 @@
   transform-origin: center;
 }
 
-.left-wing {
-  animation-name: flapLeft;
-}
-
-.right-wing {
-  animation-name: flapRight;
-}
+.left-wing { animation-name: flapLeft; }
+.right-wing { animation-name: flapRight; }
 
 @keyframes flapLeft {
   0% { transform: rotate(0deg) scaleY(1); }
@@ -96,26 +139,26 @@
 /* ===== House Select ===== */
 
 .house-select {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .select-label {
-  font-size: 1.1rem;
-  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
   color: var(--text-light);
 }
 
 .house-buttons {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.5rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .house-btn {
   font-family: 'Lora', serif;
-  font-size: 0.9rem;
-  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-light);
   border: 2px solid rgba(255, 255, 255, 0.15);
@@ -124,16 +167,12 @@
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.house-btn:hover {
-  transform: scale(1.05);
-}
-
-.house-icon {
-  font-size: 1.1rem;
-}
+.house-btn:hover { transform: scale(1.05); }
+.house-icon { font-size: 1rem; }
 
 .gryffindor-btn { border-color: rgba(174, 0, 1, 0.4); }
 .hufflepuff-btn { border-color: rgba(236, 185, 57, 0.4); }
@@ -145,13 +184,11 @@
 .ravenclaw-btn.selected { background: rgba(34, 47, 91, 0.3); border-color: #222f5b; box-shadow: 0 0 12px rgba(34, 47, 91, 0.3); }
 .slytherin-btn.selected { background: rgba(42, 98, 61, 0.3); border-color: #2a623d; box-shadow: 0 0 12px rgba(42, 98, 61, 0.3); }
 
-.difficulty-select {
-  margin-top: 0.5rem;
-}
+.difficulty-select { margin-top: 0.5rem; }
 
 .diff-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 0.8rem;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -161,7 +198,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
-  min-width: 140px;
+  min-width: 130px;
 }
 
 .diff-desc {
@@ -203,7 +240,7 @@
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   flex-wrap: wrap;
 }
 
@@ -214,7 +251,7 @@
 }
 
 .hud-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   opacity: 0.6;
@@ -222,7 +259,7 @@
 
 .hud-value {
   font-family: 'Cinzel Decorative', cursive;
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: var(--gold);
   text-shadow: 0 0 10px rgba(212, 168, 67, 0.4);
 }
@@ -247,9 +284,9 @@
   max-height: 500px;
   min-height: 300px;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(10, 30, 60, 0.8) 0%, transparent 70%),
-    linear-gradient(180deg, #0a1628 0%, #162040 40%, #1a3020 70%, #0d2010 100%);
-  border: 2px solid rgba(212, 168, 67, 0.2);
+    radial-gradient(ellipse at 50% 0%, rgba(100, 160, 220, 0.15) 0%, transparent 60%),
+    linear-gradient(180deg, #3a5a3a 0%, #2d4a2d 30%, #264026 60%, #1e3520 100%);
+  border: 2px solid rgba(212, 168, 67, 0.3);
   border-radius: 16px;
   overflow: hidden;
   cursor: none;
@@ -258,15 +295,14 @@
   touch-action: none;
 }
 
-/* Quidditch field subtle lines */
+/* Quidditch pitch lines */
 .game-field::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 40%),
-    linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 60px;
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 35%),
+    linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,0.06) 49.5%, rgba(255,255,255,0.06) 50.5%, transparent 50.5%);
   pointer-events: none;
 }
 
@@ -277,7 +313,6 @@
   width: 80px;
   height: 40px;
   z-index: 10;
-  transition: transform 0.05s linear;
   filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
   pointer-events: none;
 }
@@ -325,7 +360,6 @@
   100% { filter: drop-shadow(0 0 0px transparent) brightness(1); transform: scale(0); opacity: 0; }
 }
 
-/* Golden trail behind snitch */
 .snitch::after {
   content: '';
   position: absolute;
@@ -339,8 +373,7 @@
   box-shadow:
     0 0 8px var(--gold),
     -8px 4px 5px rgba(212, 168, 67, 0.3),
-    -16px 2px 4px rgba(212, 168, 67, 0.2),
-    -24px 6px 3px rgba(212, 168, 67, 0.1);
+    -16px 2px 4px rgba(212, 168, 67, 0.2);
   pointer-events: none;
   opacity: 0.5;
 }
@@ -368,7 +401,6 @@
   100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
 }
 
-/* Sparks on catch */
 .spark {
   position: absolute;
   width: 4px;
@@ -390,17 +422,12 @@
 
 /* ===== Result ===== */
 
-.result-snitch {
-  margin: 1rem 0;
-  animation: snitchFloat 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 15px rgba(212, 168, 67, 0.5));
-}
-
 .result-score {
   font-family: 'Cinzel Decorative', cursive;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: var(--gold);
   margin-bottom: 0.5rem;
+  line-height: 1.6;
 }
 
 .result-msg {
@@ -444,30 +471,34 @@
   }
 
   .game-hud {
-    gap: 1.5rem;
+    gap: 1.2rem;
   }
 
   .hud-value {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .player {
-    width: 65px;
-    height: 33px;
+    width: 55px;
+    height: 28px;
   }
 
   .snitch {
-    width: 45px;
-    height: 23px;
+    width: 40px;
+    height: 20px;
   }
 
   .diff-btn {
-    min-width: 110px;
-    padding: 0.6rem 1rem;
-    font-size: 0.95rem;
+    min-width: 100px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
   }
 
   .intro-preview {
-    gap: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .broom-preview {
+    width: 75px;
   }
 }
