@@ -279,9 +279,17 @@
 .game-hud {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   margin-bottom: 0.8rem;
   flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.scores-hud {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .hud-item {
@@ -488,10 +496,11 @@
 
 .joysticks {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   padding: 0.8rem 0.5rem;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .joystick-wrapper {
