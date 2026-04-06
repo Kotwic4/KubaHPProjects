@@ -133,3 +133,17 @@ footer {
   opacity: 0.5;
   font-size: 0.85rem;
 }
+
+.version {
+  font-size: 0.7rem;
+  opacity: 0.5;
+  margin-top: 0.3rem;
+}
+
+.app-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+  font-size: 0.7rem;
+  opacity: 0.3;
+}
