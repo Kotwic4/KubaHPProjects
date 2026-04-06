@@ -329,7 +329,6 @@
   border: 2px solid rgba(212, 168, 67, 0.3);
   border-radius: 16px;
   overflow: hidden;
-  cursor: none;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
@@ -521,6 +520,7 @@
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  cursor: pointer;
 }
 
 .joystick-knob {

@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="quidditch.css?v=3">
+  <link rel="stylesheet" href="quidditch.css?v=4">
 </head>
 <body>
   <div class="container">
@@ -251,15 +251,15 @@
 
       </div>
 
-      <!-- Joysticki dotykowe (multi na mobile) -->
+      <!-- Joysticki sterowania -->
       <div class="joysticks hidden" id="joysticks">
-        <div class="joystick-wrapper">
+        <div class="joystick-wrapper" id="joy-wrapper-p1">
           <span class="joy-label" id="joy-label-p1">Gracz 1</span>
           <div class="joystick" id="joystick1">
             <div class="joystick-knob" id="knob1"></div>
           </div>
         </div>
-        <div class="joystick-wrapper">
+        <div class="joystick-wrapper hidden" id="joy-wrapper-p2">
           <span class="joy-label" id="joy-label-p2">Gracz 2</span>
           <div class="joystick" id="joystick2">
             <div class="joystick-knob" id="knob2"></div>
@@ -279,6 +279,6 @@
     </div>
   </div>
 
-  <script src="quidditch.js?v=3"></script>
+  <script src="quidditch.js?v=4"></script>
 </body>
 </html>

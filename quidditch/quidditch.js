@@ -40,13 +40,10 @@ let snitchCatchable = true;
 // Pozycje graczy
 let p1x = 0, p1y = 0;
 let p2x = 0, p2y = 0;
-// Cel myszy/dotyku
-let targetX = 0, targetY = 0;
-let usingMouse = false;
-// Joysticki dotykowe (multi na mobile)
+
+// Joysticki
 const joystickP1 = { active: false, dx: 0, dy: 0 };
 const joystickP2 = { active: false, dx: 0, dy: 0 };
-const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
 // Znicz
 let snitchX = 0, snitchY = 0;
@@ -89,10 +86,10 @@ document.getElementById("mode-buttons").addEventListener("pointerdown", function
   document.getElementById("p1-name-label").textContent = multiMode ? "Imię gracza 1:" : "Twoje imię:";
   document.getElementById("p1-house-label").textContent = multiMode ? "Gracz 1 - wybierz dom (WASD):" : "Wybierz swój dom:";
   document.getElementById("controls-hint").textContent = multiMode
-    ? (isTouchDevice ? "Steruj joystickami pod polem gry!" : "Gracz 1: WASD | Gracz 2: Strzałki")
-    : "Steruj strzałkami lub WASD na klawiaturze, albo palcem na ekranie dotykowym!";
-  document.getElementById("preview-label-p1").textContent = multiMode ? (isTouchDevice ? "Joystick" : "WASD") : "";
-  document.getElementById("preview-label-p2").textContent = multiMode ? (isTouchDevice ? "Joystick" : "Strzałki") : "Strzałki";
+    ? "Steruj joystickami lub klawiaturą (WASD + Strzałki)"
+    : "Steruj joystickiem, strzałkami lub WASD!";
+  document.getElementById("preview-label-p1").textContent = multiMode ? "WASD" : "";
+  document.getElementById("preview-label-p2").textContent = multiMode ? "Strzałki" : "";
 });
 
 // === Wybór domu P1 ===
@@ -144,7 +141,6 @@ function startGame(diff) {
   snitchSpeed = difficulty.snitchSpeed;
   gameRunning = true;
   snitchCatchable = true;
-  usingMouse = false;
 
   // Odczytaj imiona
   p1Name = document.getElementById("p1-name").value.trim() || (multiMode ? "Gracz 1" : "");
@@ -159,21 +155,23 @@ function startGame(diff) {
   joystickP1.active = false; joystickP1.dx = 0; joystickP1.dy = 0;
   joystickP2.active = false; joystickP2.dx = 0; joystickP2.dy = 0;
 
-  // Pokaż/ukryj joysticki dotykowe
-  const showJoysticks = multiMode && isTouchDevice;
+  // Pokaż joysticki
   const joysticksEl = document.getElementById("joysticks");
   if (joysticksEl) {
-    joysticksEl.classList.toggle("hidden", !showJoysticks);
-    field.classList.toggle("with-joysticks", showJoysticks);
+    joysticksEl.classList.remove("hidden");
+    field.classList.add("with-joysticks");
     // Resetuj pozycje gałek
     document.getElementById("knob1").style.transform = "translate(-50%, -50%)";
     document.getElementById("knob2").style.transform = "translate(-50%, -50%)";
 
-    // Ustaw kolory joysticków
-    if (showJoysticks) {
-      document.getElementById("joystick1").style.borderColor = HOUSE_COLORS[p1House];
-      document.getElementById("knob1").style.background = HOUSE_COLORS[p1House];
-      document.getElementById("joy-label-p1").textContent = p1Name;
+    // P1 joystick
+    document.getElementById("joystick1").style.borderColor = HOUSE_COLORS[p1House];
+    document.getElementById("knob1").style.background = HOUSE_COLORS[p1House];
+    document.getElementById("joy-label-p1").textContent = multiMode ? p1Name : (p1Name || "Gracz");
+
+    // P2 joystick — pokaż tylko w multi
+    document.getElementById("joy-wrapper-p2").classList.toggle("hidden", !multiMode);
+    if (multiMode) {
       document.getElementById("joystick2").style.borderColor = HOUSE_COLORS[p2House];
       document.getElementById("knob2").style.background = HOUSE_COLORS[p2House];
       document.getElementById("joy-label-p2").textContent = p2Name;
@@ -202,8 +200,6 @@ function startGame(diff) {
   // Pozycje startowe
   p1x = fieldW * 0.2;
   p1y = fieldH * 0.5;
-  targetX = p1x;
-  targetY = p1y;
 
   if (multiMode) {
     p2x = fieldW * 0.8 - 80;
@@ -268,7 +264,6 @@ function gameLoop() {
   // Ruch gracza 1
   let p1dx = 0;
   if (keysP1.left || keysP1.right || keysP1.up || keysP1.down) {
-    usingMouse = false;
     const r = movePlayer(p1x, p1y, keysP1, difficulty.playerSpeed);
     p1x = r.x; p1y = r.y; p1dx = r.dx;
   } else if (joystickP1.active) {
@@ -278,16 +273,6 @@ function gameLoop() {
     p1x = Math.max(0, Math.min(fieldW - 80, p1x));
     p1y = Math.max(0, Math.min(fieldH - 40, p1y));
     p1dx = joystickP1.dx;
-  } else if (!multiMode && usingMouse) {
-    const dx = targetX - p1x;
-    const dy = targetY - p1y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > 2) {
-      const speed = Math.min(difficulty.playerSpeed, dist * 0.15);
-      p1x += (dx / dist) * speed;
-      p1y += (dy / dist) * speed;
-    }
-    p1dx = dx;
   }
 
   // Ruch gracza 2 (multi)
@@ -436,47 +421,21 @@ document.addEventListener("keyup", function (e) {
   if (k === "ArrowRight") { (multiMode ? keysP2 : keysP1).right = false; }
 });
 
-// Mysz/dotyk - tylko w trybie solo
-field.addEventListener("mousemove", function (e) {
-  if (!gameRunning || multiMode) return;
-  usingMouse = true;
-  const rect = field.getBoundingClientRect();
-  targetX = e.clientX - rect.left - 40;
-  targetY = e.clientY - rect.top - 20;
-  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
-  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
-});
-
-// Dotyk na polu gry (solo)
-function handleFieldTouch(e) {
-  if (!gameRunning || multiMode) return;
-  e.preventDefault();
-  usingMouse = true;
-  const t = e.touches[0];
-  const rect = field.getBoundingClientRect();
-  targetX = t.clientX - rect.left - 40;
-  targetY = t.clientY - rect.top - 20;
-  targetX = Math.max(0, Math.min(fieldW - 80, targetX));
-  targetY = Math.max(0, Math.min(fieldH - 40, targetY));
-}
-
-field.addEventListener("touchstart", handleFieldTouch, { passive: false });
-field.addEventListener("touchmove", handleFieldTouch, { passive: false });
-
-// === Joysticki dotykowe (multi) ===
+// === Joysticki (mysz + dotyk) ===
 
 function setupJoystick(elId, knobId, joystickState) {
   const el = document.getElementById(elId);
   const knob = document.getElementById(knobId);
   if (!el || !knob) return;
   let touchId = null;
+  let mouseDown = false;
 
-  function updateKnob(touchX, touchY) {
+  function updateKnob(clientX, clientY) {
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    let dx = touchX - cx;
-    let dy = touchY - cy;
+    let dx = clientX - cx;
+    let dy = clientY - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
     const maxDist = rect.width / 2 - 12;
     if (dist > maxDist) {
@@ -484,7 +443,6 @@ function setupJoystick(elId, knobId, joystickState) {
       dy = (dy / dist) * maxDist;
     }
     knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-    // Normalizuj do -1..1
     const norm = Math.min(dist, maxDist) / maxDist;
     if (dist > 8) {
       joystickState.dx = (dx / Math.max(dist, maxDist)) * norm;
@@ -503,8 +461,10 @@ function setupJoystick(elId, knobId, joystickState) {
     joystickState.dy = 0;
     joystickState.active = false;
     touchId = null;
+    mouseDown = false;
   }
 
+  // Dotyk
   el.addEventListener("touchstart", function (e) {
     e.preventDefault();
     const t = e.changedTouches[0];
@@ -534,6 +494,22 @@ function setupJoystick(elId, knobId, joystickState) {
   el.addEventListener("touchcancel", function () {
     resetKnob();
   }, { passive: false });
+
+  // Mysz
+  el.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+    mouseDown = true;
+    updateKnob(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mousemove", function (e) {
+    if (!mouseDown) return;
+    updateKnob(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mouseup", function () {
+    if (mouseDown) resetKnob();
+  });
 }
 
 setupJoystick("joystick1", "knob1", joystickP1);
