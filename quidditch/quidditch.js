@@ -307,12 +307,12 @@ function gameLoop() {
   if (multiMode) snitchFleeFrom(p2x + 40, p2y + 20);
 
   // Kierunek graczy
-  if (p1dx < -1) player1El.classList.add("facing-left");
-  else if (p1dx > 1) player1El.classList.remove("facing-left");
+  if (p1dx < -0.1) player1El.classList.add("facing-left");
+  else if (p1dx > 0.1) player1El.classList.remove("facing-left");
 
   if (multiMode) {
-    if (p2dx < -1) player2El.classList.add("facing-left");
-    else if (p2dx > 1) player2El.classList.remove("facing-left");
+    if (p2dx < -0.1) player2El.classList.add("facing-left");
+    else if (p2dx > 0.1) player2El.classList.remove("facing-left");
   }
 
   // Kolizje
@@ -443,10 +443,9 @@ function setupJoystick(elId, knobId, joystickState) {
       dy = (dy / dist) * maxDist;
     }
     knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-    const norm = Math.min(dist, maxDist) / maxDist;
     if (dist > 8) {
-      joystickState.dx = (dx / Math.max(dist, maxDist)) * norm;
-      joystickState.dy = (dy / Math.max(dist, maxDist)) * norm;
+      joystickState.dx = dx / maxDist;
+      joystickState.dy = dy / maxDist;
       joystickState.active = true;
     } else {
       joystickState.dx = 0;
