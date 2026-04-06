@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kreator Różdżki</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="wand.css?v=1">
+</head>
+<body>
+  <div class="container">
+    <a href="../" class="back-link">Powrót do Magicznego Świata</a>
+
+    <!-- ===== INTRO ===== -->
+    <div id="intro" class="screen">
+      <h1>Kreator Różdżki</h1>
+      <p class="subtitle">"Różdżka wybiera czarodzieja, pamiętaj o tym..."</p>
+
+      <div class="hat-wrapper intro-wand">
+        <div class="sparkles">
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+          <div class="sparkle"></div>
+        </div>
+        <svg class="intro-wand-svg" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="introWoodGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#d4b078"/>
+              <stop offset="50%" stop-color="#a07840"/>
+              <stop offset="100%" stop-color="#6b4c2a"/>
+            </linearGradient>
+            <filter id="introGlow">
+              <feGaussianBlur stdDeviation="3"/>
+            </filter>
+          </defs>
+          <!-- Poświata -->
+          <ellipse cx="160" cy="40" rx="30" ry="20" fill="rgba(212, 168, 67, 0.3)" filter="url(#introGlow)"/>
+          <!-- Różdżka -->
+          <path d="M20 35 L170 38 L172 40 L170 42 L20 45 Z" fill="url(#introWoodGrad)" stroke="#5a3d25" stroke-width="0.5"/>
+          <!-- Rękojeść -->
+          <ellipse cx="28" cy="40" rx="3" ry="7" fill="#5a3d25" stroke="#8b6914" stroke-width="0.5"/>
+          <ellipse cx="35" cy="40" rx="2" ry="6" fill="#5a3d25" opacity="0.6"/>
+          <ellipse cx="18" cy="40" rx="5" ry="9" fill="#5a3d25" stroke="#8b6914" stroke-width="0.8"/>
+          <circle cx="18" cy="40" r="3" fill="#d4a843" opacity="0.4"/>
+          <!-- Iskierka -->
+          <circle cx="175" cy="40" r="4" fill="#ffe066" opacity="0.9" filter="url(#introGlow)"/>
+          <circle cx="175" cy="40" r="2" fill="white" opacity="0.8"/>
+          <!-- Małe iskry -->
+          <circle cx="180" cy="34" r="1.5" fill="#ffe066" opacity="0.6" class="sparkle-dot"/>
+          <circle cx="183" cy="42" r="1" fill="#ffe066" opacity="0.5" class="sparkle-dot"/>
+          <circle cx="178" cy="48" r="1.2" fill="#ffe066" opacity="0.4" class="sparkle-dot"/>
+        </svg>
+      </div>
+
+      <div class="mode-buttons">
+        <button class="mode-card" onclick="startQuiz()">
+          <span class="mode-icon">🔮</span>
+          <span class="mode-title">Niech różdżka mnie wybierze!</span>
+          <span class="mode-desc">Odpowiedz na pytania Ollivandera i odkryj swoją różdżkę</span>
+        </button>
+        <button class="mode-card" onclick="startCustom()">
+          <span class="mode-icon">🪄</span>
+          <span class="mode-title">Sam zaprojektuję różdżkę!</span>
+          <span class="mode-desc">Wybierz drewno, rdzeń, długość i elastyczność</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div id="quiz" class="screen hidden">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+      <div class="ollivander-speaks">
+        <div class="ollivander-icon">🧙‍♂️</div>
+        <div class="speech-bubble">
+          <h2 id="question-text"></h2>
+        </div>
+      </div>
+      <div id="answers" class="answers"></div>
+    </div>
+
+    <!-- ===== CUSTOM BUILDER ===== -->
+    <div id="custom" class="screen hidden">
+      <div class="progress-bar">
+        <div class="progress-fill" id="custom-progress"></div>
+      </div>
+      <div class="custom-header">
+        <h2 id="custom-title"></h2>
+        <span class="step-num" id="custom-step-num"></span>
+      </div>
+      <div id="option-grid" class="option-grid"></div>
+      <div class="step-nav">
+        <button class="magic-btn secondary hidden" id="custom-back" onclick="customBack()">Wstecz</button>
+        <button class="magic-btn" id="custom-next" onclick="customNext()" disabled>Dalej</button>
+      </div>
+    </div>
+
+    <!-- ===== RESULT ===== -->
+    <div id="result" class="screen hidden">
+      <h1 class="result-title">Oto Twoja Różdżka!</h1>
+      <p class="result-subtitle">Każda różdżka jest wyjątkowa — tak jak jej właściciel.</p>
+
+      <div class="wand-reveal" id="wand-visual"></div>
+
+      <p class="quiz-message hidden" id="quiz-message"></p>
+
+      <div class="wand-stats">
+        <div class="stat-item">
+          <div class="stat-label">Drewno</div>
+          <div class="stat-value" id="stat-wood"></div>
+          <div class="stat-desc" id="stat-wood-desc"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Rdzeń</div>
+          <div class="stat-value" id="stat-core"></div>
+          <div class="stat-desc" id="stat-core-desc"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Długość</div>
+          <div class="stat-value" id="stat-length"></div>
+          <div class="stat-desc" id="stat-length-desc"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Elastyczność</div>
+          <div class="stat-value" id="stat-flex"></div>
+          <div class="stat-desc" id="stat-flex-desc"></div>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="magic-btn" onclick="backToIntro()">Spróbuj ponownie</button>
+        <a href="../" class="magic-btn secondary">Strona główna</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="wand.js?v=1"></script>
+</body>
+</html>
