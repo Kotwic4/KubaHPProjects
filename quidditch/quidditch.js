@@ -161,20 +161,23 @@ function startGame(diff) {
 
   // Pokaż/ukryj joysticki dotykowe
   const showJoysticks = multiMode && isTouchDevice;
-  document.getElementById("joysticks").classList.toggle("hidden", !showJoysticks);
-  field.classList.toggle("with-joysticks", showJoysticks);
-  // Resetuj pozycje gałek
-  document.getElementById("knob1").style.transform = "translate(-50%, -50%)";
-  document.getElementById("knob2").style.transform = "translate(-50%, -50%)";
+  const joysticksEl = document.getElementById("joysticks");
+  if (joysticksEl) {
+    joysticksEl.classList.toggle("hidden", !showJoysticks);
+    field.classList.toggle("with-joysticks", showJoysticks);
+    // Resetuj pozycje gałek
+    document.getElementById("knob1").style.transform = "translate(-50%, -50%)";
+    document.getElementById("knob2").style.transform = "translate(-50%, -50%)";
 
-  // Ustaw kolory joysticków
-  if (showJoysticks) {
-    document.getElementById("joystick1").style.borderColor = HOUSE_COLORS[p1House];
-    document.getElementById("knob1").style.background = HOUSE_COLORS[p1House];
-    document.getElementById("joy-label-p1").textContent = p1Name;
-    document.getElementById("joystick2").style.borderColor = HOUSE_COLORS[p2House];
-    document.getElementById("knob2").style.background = HOUSE_COLORS[p2House];
-    document.getElementById("joy-label-p2").textContent = p2Name;
+    // Ustaw kolory joysticków
+    if (showJoysticks) {
+      document.getElementById("joystick1").style.borderColor = HOUSE_COLORS[p1House];
+      document.getElementById("knob1").style.background = HOUSE_COLORS[p1House];
+      document.getElementById("joy-label-p1").textContent = p1Name;
+      document.getElementById("joystick2").style.borderColor = HOUSE_COLORS[p2House];
+      document.getElementById("knob2").style.background = HOUSE_COLORS[p2House];
+      document.getElementById("joy-label-p2").textContent = p2Name;
+    }
   }
 
   // Ustaw etykiety HUD
@@ -465,6 +468,7 @@ field.addEventListener("touchmove", handleFieldTouch, { passive: false });
 function setupJoystick(elId, knobId, joystickState) {
   const el = document.getElementById(elId);
   const knob = document.getElementById(knobId);
+  if (!el || !knob) return;
   let touchId = null;
 
   function updateKnob(touchX, touchY) {
