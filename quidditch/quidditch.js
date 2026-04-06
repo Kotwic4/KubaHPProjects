@@ -76,11 +76,8 @@ function updateIntroVisibility() {
   const multi = playerCount > 1;
   // Pokaż/ukryj sekcje graczy 2-4
   for (let i = 2; i <= MAX_PLAYERS; i++) {
-    const show = i <= playerCount;
-    const nameEl = document.getElementById("p" + i + "-name-section");
-    const houseEl = document.getElementById("p" + i + "-house-section");
-    if (nameEl) nameEl.classList.toggle("hidden", !show);
-    if (houseEl) houseEl.classList.toggle("hidden", !show);
+    const setupEl = document.getElementById("p" + i + "-setup");
+    if (setupEl) setupEl.classList.toggle("hidden", i > playerCount);
   }
 
   // Etykiety
@@ -195,7 +192,9 @@ function startGame(diff) {
   });
 
   // Joysticki i pole gry
-  document.getElementById("joysticks").classList.remove("hidden");
+  const joysticksEl = document.getElementById("joysticks");
+  joysticksEl.classList.remove("hidden");
+  joysticksEl.classList.toggle("solo", playerCount === 1);
   field.classList.add("with-joysticks");
 
   document.getElementById("intro").classList.add("hidden");

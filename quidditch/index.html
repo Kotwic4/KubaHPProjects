@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="../style.css?v=11">
-  <link rel="stylesheet" href="quidditch.css?v=11">
+  <link rel="stylesheet" href="quidditch.css?v=12">
 </head>
 <body>
   <div class="container">
@@ -28,29 +28,12 @@
         </div>
       </div>
 
-      <!-- Player names -->
-      <div class="name-inputs">
-        <div class="name-field">
+      <!-- Player setup (name + house grouped per player) -->
+      <div class="player-setup" id="p1-setup">
+        <div class="player-setup-header">
           <label for="p1-name" class="select-label" id="p1-name-label">Twoje imię:</label>
           <input type="text" id="p1-name" class="magic-input" placeholder="Gracz 1" maxlength="15">
         </div>
-        <div class="name-field hidden" id="p2-name-section">
-          <label for="p2-name" class="select-label">Gracz 2:</label>
-          <input type="text" id="p2-name" class="magic-input" placeholder="Gracz 2" maxlength="15">
-        </div>
-        <div class="name-field hidden" id="p3-name-section">
-          <label for="p3-name" class="select-label">Gracz 3:</label>
-          <input type="text" id="p3-name" class="magic-input" placeholder="Gracz 3" maxlength="15">
-        </div>
-        <div class="name-field hidden" id="p4-name-section">
-          <label for="p4-name" class="select-label">Gracz 4:</label>
-          <input type="text" id="p4-name" class="magic-input" placeholder="Gracz 4" maxlength="15">
-        </div>
-      </div>
-
-      <!-- House selects -->
-      <div class="house-select">
-        <p class="select-label" id="p1-house-label">Wybierz swój dom:</p>
         <div class="house-buttons" id="house-buttons-p1">
           <button class="house-btn gryffindor-btn selected" data-house="gryffindor"><span class="house-icon">🦁</span> Gryffindor</button>
           <button class="house-btn hufflepuff-btn" data-house="hufflepuff"><span class="house-icon">🦡</span> Hufflepuff</button>
@@ -58,8 +41,11 @@
           <button class="house-btn slytherin-btn" data-house="slytherin"><span class="house-icon">🐍</span> Slytherin</button>
         </div>
       </div>
-      <div class="house-select hidden" id="p2-house-section">
-        <p class="select-label">Gracz 2 - dom:</p>
+      <div class="player-setup hidden" id="p2-setup">
+        <div class="player-setup-header">
+          <label for="p2-name" class="select-label">Gracz 2:</label>
+          <input type="text" id="p2-name" class="magic-input" placeholder="Gracz 2" maxlength="15">
+        </div>
         <div class="house-buttons" id="house-buttons-p2">
           <button class="house-btn gryffindor-btn" data-house="gryffindor"><span class="house-icon">🦁</span> Gryffindor</button>
           <button class="house-btn hufflepuff-btn" data-house="hufflepuff"><span class="house-icon">🦡</span> Hufflepuff</button>
@@ -67,8 +53,11 @@
           <button class="house-btn slytherin-btn selected" data-house="slytherin"><span class="house-icon">🐍</span> Slytherin</button>
         </div>
       </div>
-      <div class="house-select hidden" id="p3-house-section">
-        <p class="select-label">Gracz 3 - dom:</p>
+      <div class="player-setup hidden" id="p3-setup">
+        <div class="player-setup-header">
+          <label for="p3-name" class="select-label">Gracz 3:</label>
+          <input type="text" id="p3-name" class="magic-input" placeholder="Gracz 3" maxlength="15">
+        </div>
         <div class="house-buttons" id="house-buttons-p3">
           <button class="house-btn gryffindor-btn" data-house="gryffindor"><span class="house-icon">🦁</span> Gryffindor</button>
           <button class="house-btn hufflepuff-btn" data-house="hufflepuff"><span class="house-icon">🦡</span> Hufflepuff</button>
@@ -76,8 +65,11 @@
           <button class="house-btn slytherin-btn" data-house="slytherin"><span class="house-icon">🐍</span> Slytherin</button>
         </div>
       </div>
-      <div class="house-select hidden" id="p4-house-section">
-        <p class="select-label">Gracz 4 - dom:</p>
+      <div class="player-setup hidden" id="p4-setup">
+        <div class="player-setup-header">
+          <label for="p4-name" class="select-label">Gracz 4:</label>
+          <input type="text" id="p4-name" class="magic-input" placeholder="Gracz 4" maxlength="15">
+        </div>
         <div class="house-buttons" id="house-buttons-p4">
           <button class="house-btn gryffindor-btn" data-house="gryffindor"><span class="house-icon">🦁</span> Gryffindor</button>
           <button class="house-btn hufflepuff-btn selected" data-house="hufflepuff"><span class="house-icon">🦡</span> Hufflepuff</button>
@@ -229,7 +221,7 @@
     <footer class="app-footer"><span id="app-version"></span></footer>
   </div>
 
-  <script src="quidditch.js?v=11"></script>
+  <script src="quidditch.js?v=12"></script>
   <script src="../version.js?v=11"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
   var el = document.getElementById("app-version");
-  if (el) el.textContent = "v11";
+  if (el) el.textContent = "v12";
 });

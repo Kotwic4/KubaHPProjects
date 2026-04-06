@@ -32,18 +32,24 @@
 
 .mode-buttons {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.5rem;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .mode-btn {
-  font-size: 0.95rem;
-  padding: 0.5rem 1.5rem;
-  opacity: 0.5;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  opacity: 0.4;
+  border: 2px solid rgba(212, 168, 67, 0.3);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--gold);
 }
 
 .mode-btn.selected {
   opacity: 1;
+  background: linear-gradient(135deg, var(--gold), #b8942e);
+  color: var(--darker-bg);
   box-shadow: 0 0 15px rgba(212, 168, 67, 0.4);
 }
 
@@ -136,33 +142,35 @@
   100% { transform: rotate(8deg) scaleY(0.7); }
 }
 
-/* ===== Name Inputs ===== */
+/* ===== Player Setup (name + house grouped) ===== */
 
-.name-inputs {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+.player-setup {
+  margin-bottom: 0.8rem;
+  padding: 0.8rem;
+  border: 1px solid rgba(212, 168, 67, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.name-field {
+.player-setup-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .magic-input {
   font-family: 'Lora', serif;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
   background: rgba(255, 255, 255, 0.08);
   color: var(--gold);
   border: 2px solid rgba(212, 168, 67, 0.3);
   border-radius: 8px;
   text-align: center;
-  width: 160px;
+  width: 140px;
   outline: none;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
@@ -176,16 +184,10 @@
   box-shadow: 0 0 12px rgba(212, 168, 67, 0.2);
 }
 
-/* ===== House Select ===== */
-
-.house-select {
-  margin-bottom: 1rem;
-}
-
 .select-label {
-  font-size: 1rem;
-  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
   color: var(--text-light);
+  white-space: nowrap;
 }
 
 .house-buttons {
@@ -495,19 +497,20 @@
 /* ===== Touch Joysticks (Multi Mobile) ===== */
 
 .joysticks {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.8rem 0.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .joystick-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.2rem;
 }
 
 .joy-label {
@@ -519,10 +522,15 @@
   letter-spacing: 1px;
 }
 
+.joysticks.solo {
+  grid-template-columns: 1fr;
+  max-width: 160px;
+}
+
 .joystick {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(212, 168, 67, 0.3);
@@ -536,8 +544,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: rgba(212, 168, 67, 0.6);
   transform: translate(-50%, -50%);
@@ -576,13 +584,32 @@
   }
 
   .joystick {
-    width: 100px;
-    height: 100px;
+    width: 85px;
+    height: 85px;
   }
 
   .joystick-knob {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .joysticks {
+    max-width: 260px;
+    gap: 0.4rem;
+  }
+
+  .mode-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .player-setup {
+    padding: 0.5rem;
+  }
+
+  .house-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
   }
 
   .game-hud {
